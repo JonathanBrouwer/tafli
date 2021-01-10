@@ -6,7 +6,7 @@
         <div class="board-piece board-piece-white board-piece-king" v-if="state.fields[x - 1][y - 1] === FieldState.WhiteKing"></div>
         <div class="board-piece board-piece-black" v-if="state.fields[x - 1][y - 1] === FieldState.BlackPiece"></div>
       </div>
-      <div class="col count row-count">{{y}}</div>
+      <div class="col count row-count">{{12-y}}</div>
     </div>
     <div class="row g-0">
       <div class="col count col-count" v-for="x in 11" :key="x">{{String.fromCharCode(65 + x - 1)}}</div>
@@ -17,12 +17,12 @@
 </template>
 
 <script>
-import {BoardData, FieldState} from "@/ts/boarddata";
+import {BoardConfiguration, FieldState} from "../ts/board_configuration";
 
 export default {
   name: 'board',
   props: {
-    state: BoardData
+    state: BoardConfiguration
   },
   data() {
     return {

@@ -1,5 +1,4 @@
-// eslint-disable-next-line no-unused-vars
-export class BoardData {
+export class BoardConfiguration {
     fields: FieldState[][];
     turn: Player;
 
@@ -9,15 +8,13 @@ export class BoardData {
     }
 }
 
-// eslint-disable-next-line no-unused-vars
 export enum FieldState {
-    WhiteKing,
-    WhitePiece,
-    BlackPiece,
-    Empty
+    WhiteKing = "WhiteKing",
+    WhitePiece = "WhitePiece",
+    BlackPiece = "BlackPiece",
+    Empty = "Empty"
 }
 
-// eslint-disable-next-line no-unused-vars
 export enum Player {
     White, Black
 }

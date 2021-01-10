@@ -3,14 +3,15 @@ use crate::tafl::board::FieldState::{WhitePiece, WhiteKing, BlackPiece, Empty};
 use std::convert::TryInto;
 use crate::tafl::board::MakeMoveError::{IllegalMove, WrongPlayer};
 
-struct BoardConfiguration {
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
+pub struct BoardConfiguration {
     fields: [[FieldState; 11]; 11],
     turn: Player
 }
 
 impl BoardConfiguration {
     /// Creates a new board in the starting configuration
-    fn new() -> Self {
+    pub(crate) fn new() -> Self {
         BoardConfiguration {
             fields: include_str!("../assets/tafl_board.txt").lines().map(|line| {
                 line.chars().map(|char| {
@@ -77,7 +78,7 @@ enum MakeMoveError {
     WrongPlayer
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
 enum Player {
     White, Black
 }
@@ -91,7 +92,7 @@ impl Player {
     }
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
 enum FieldState {
     WhiteKing,
     WhitePiece,

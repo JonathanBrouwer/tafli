@@ -15,17 +15,14 @@
 
 import Board from "@/components/Board";
 import Navbar from "@/components/Navbar";
-import { BoardData, Player, FieldState } from "@/ts/boarddata";
+import {BoardConfiguration, Player, FieldState} from "./ts/board_configuration";
 
 export default {
   name: 'App',
   components: {Board, Navbar},
   data() {
     return {
-      boarddata: new BoardData([
-          [FieldState.Empty, FieldState.WhitePiece, FieldState.BlackPiece, FieldState.WhiteKing, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
-        [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
-            [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
+      boarddata: new BoardConfiguration([
         [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
         [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
         [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
@@ -33,8 +30,18 @@ export default {
         [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
         [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
         [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
-        [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty]], Player.White)
+        [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
+        [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
+        [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
+        [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty]], Player.Black)
     }
+  },
+  mounted() {
+    fetch("http://localhost:8000/api/get_board")
+        .then(res => res.json())
+        .then(data => {
+          this.boarddata = Object.assign(BoardConfiguration, data);
+        });
   }
 }
 </script>
