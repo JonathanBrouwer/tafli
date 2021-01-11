@@ -15,6 +15,16 @@ export enum FieldState {
     Empty = "Empty"
 }
 
+export function player(state: FieldState) {
+    if (state == FieldState.WhiteKing || state == FieldState.WhitePiece) {
+        return Player.White;
+    }else if (state == FieldState.BlackPiece) {
+        return Player.Black;
+    } else {
+        return null;
+    }
+}
+
 export enum Player {
     White = "White", Black = "Black"
 }

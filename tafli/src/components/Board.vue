@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import {BoardConfiguration, FieldState, Player} from "../ts/board_configuration";
+import {BoardConfiguration, FieldState, player, Player} from "../ts/board_configuration";
 
 export default {
   name: 'board',
@@ -37,58 +37,45 @@ export default {
   },
   methods: {
     click_square(x, y) {
-      if (this.active_square != null && this.active_square[0] === x && this.active_square[1] === y) {
-        this.active_square = null;
-        this.legal_moves = [];
-        return;
-      }
+      //First move
       if (this.active_square === null) {
-        if (this.state.fields[x][y] === FieldState.Empty) {
+        //If we don't click on our own piece
+        if (player(this.state.fields[x][y]) !== this.state.turn) {
           this.active_square = null;
           this.legal_moves = [];
-          return;
-        }
-        if ((this.state.fields[x][y] === FieldState.WhitePiece || this.state.fields[x][y] === FieldState.WhiteKing) && this.state.turn === Player.Black) {
-          this.active_square = null;
-          this.legal_moves = [];
-          return;
-        }
-        if (this.state.fields[x][y] === FieldState.BlackPiece && this.state.turn === Player.White) {
-          this.active_square = null;
-          this.legal_moves = [];
-          return;
-        }
-        this.active_square = [x, y];
-        this.legal_moves = [];
-        fetch("http://localhost:8000/api/legal_moves?pos=" + this.active_square[0] + "," + this.active_square[1])
-            .then(res => res.json())
-            .then(data => {
-              this.legal_moves = data.moves;
-            });
-      } else {
-        if (this.state.fields[x][y] !== FieldState.Empty) {
-          this.active_square = [x, y];
-          this.legal_moves = [];
-          fetch("http://localhost:8000/api/legal_moves?pos=" + this.active_square[0] + "," + this.active_square[1])
-              .then(res => res.json())
-              .then(data => {
-                this.legal_moves = data.moves;
-              });
           return;
         }
 
+        //Select the piece, and get legal moves
+        this.select_square(x, y);
+      } else {
+        //If we click the same piece again, deselect
+        if (this.active_square[0] === x && this.active_square[1] === y) {
+          this.active_square = null;
+          this.legal_moves = [];
+          return;
+        }
+        //If we click another piece of ourself, select that
+        if (player(this.state.fields[x][y]) === this.state.turn) {
+          this.select_square(x, y);
+          return;
+        }
+        //Else, make a move
         let from = this.active_square;
         let to = [x, y];
-        fetch("http://localhost:8000/api/make_move?from=" + from[0] + "," + from[1] + "&to=" + to[0] + "," + to[1])
-            .then(res => res.json())
-            .then(data => {
-              if (data !== "SUCCESS") {
-                window.alert("Illegal move.");
-              }
-            });
+        fetch("http://localhost:8000/api/make_move?from=" + from[0] + "," + from[1] + "&to=" + to[0] + "," + to[1]);
         this.active_square = null;
         this.legal_moves = [];
       }
+    },
+    select_square(x, y) {
+      this.active_square = [x, y];
+      this.legal_moves = [];
+      fetch("http://localhost:8000/api/legal_moves?pos=" + this.active_square[0] + "," + this.active_square[1])
+          .then(res => res.json())
+          .then(data => {
+            this.legal_moves = data.moves;
+          });
     },
     should_highlight(x, y) {
       return this.active_square !== null && !(this.active_square[0] !== x || this.active_square[1] !== y);
