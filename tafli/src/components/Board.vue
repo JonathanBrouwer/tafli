@@ -2,7 +2,8 @@
   <div id="board">
     <div v-for="y in 11" :key="y" class="row g-0 board-row">
       <div v-for="x in 11" :key="x"
-           class="col board-tile" v-bind:class="{ 'selected': should_highlight(x-1, y-1) }"
+           class="col board-tile"
+           v-bind:class="{ 'selected': should_highlight(x-1, y-1), 'legal-move': should_show_legal(x-1, y-1) }"
            v-on:click="click_square(x-1, y-1)">
         <div v-if="state.fields[x - 1][y - 1] === FieldState.WhitePiece" class="board-piece board-piece-white"></div>
         <div v-if="state.fields[x - 1][y - 1] === FieldState.WhiteKing"
@@ -30,32 +31,49 @@ export default {
   data() {
     return {
       FieldState: FieldState,
-      active_square: null
+      active_square: null,
+      legal_moves: []
     }
   },
   methods: {
     click_square(x, y) {
       if (this.active_square != null && this.active_square[0] === x && this.active_square[1] === y) {
         this.active_square = null;
+        this.legal_moves = [];
         return;
       }
       if (this.active_square === null) {
         if (this.state.fields[x][y] === FieldState.Empty) {
           this.active_square = null;
+          this.legal_moves = [];
           return;
         }
         if ((this.state.fields[x][y] === FieldState.WhitePiece || this.state.fields[x][y] === FieldState.WhiteKing) && this.state.turn === Player.Black) {
           this.active_square = null;
+          this.legal_moves = [];
           return;
         }
         if (this.state.fields[x][y] === FieldState.BlackPiece && this.state.turn === Player.White) {
           this.active_square = null;
+          this.legal_moves = [];
           return;
         }
         this.active_square = [x, y];
+        this.legal_moves = [];
+        fetch("http://localhost:8000/api/legal_moves?pos=" + this.active_square[0] + "," + this.active_square[1])
+            .then(res => res.json())
+            .then(data => {
+              this.legal_moves = data.moves;
+            });
       } else {
         if (this.state.fields[x][y] !== FieldState.Empty) {
           this.active_square = [x, y];
+          this.legal_moves = [];
+          fetch("http://localhost:8000/api/legal_moves?pos=" + this.active_square[0] + "," + this.active_square[1])
+              .then(res => res.json())
+              .then(data => {
+                this.legal_moves = data.moves;
+              });
           return;
         }
 
@@ -69,10 +87,14 @@ export default {
               }
             });
         this.active_square = null;
+        this.legal_moves = [];
       }
     },
     should_highlight(x, y) {
       return this.active_square !== null && !(this.active_square[0] !== x || this.active_square[1] !== y);
+    },
+    should_show_legal(x, y) {
+      return this.legal_moves.filter(m => m[0] === x && m[1] === y).length > 0
     }
   }
 }
@@ -151,5 +173,8 @@ export default {
 
 #board .board-row .board-tile.selected {
   background: rgba(40, 167, 69, .6) !important;
+}
+#board .board-row .board-tile.legal-move {
+  background: rgba(40, 167, 69, .2) !important;
 }
 </style>

@@ -5,12 +5,9 @@ extern crate serde;
 #[macro_use]
 extern crate lazy_static;
 
-use actix::Actor;
 use actix_cors::Cors;
 use actix_files as fs;
 use actix_web::{App, HttpServer, middleware::Logger, web};
-
-use crate::api::board_broadcast_server::BoardBroadcast;
 
 mod tafl;
 mod api;
@@ -29,6 +26,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(cors)
             .route("/api/get_board", web::get().to(api::get_board::get_board))
             .service(api::make_move::make_move)
+            .service(api::legal_moves::legal_moves)
             .service(fs::Files::new("/", "./tafli/dist").show_files_listing().index_file("index.html"))
     })
         .bind(("127.0.0.1", 8000))?

@@ -2,7 +2,7 @@ use actix::prelude::*;
 use actix_web::{Error, HttpRequest, HttpResponse, web};
 use actix_web_actors::ws;
 
-use crate::api::board_broadcast_server::{BoardBroadcast, Connect, Disconnect, ReceiveBoard};
+use crate::api::board_broadcast_server::{Connect, Disconnect, ReceiveBoard};
 
 use crate::api::board_broadcast_server::board_broadcast;
 
