@@ -1606,6 +1606,7 @@ dependencies = [
  "bytes 0.5.6",
  "env_logger",
  "futures",
+ "lazy_static",
  "rand",
  "serde",
  "serde_json",

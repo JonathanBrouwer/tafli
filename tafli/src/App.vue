@@ -39,8 +39,9 @@ export default {
   mounted() {
     let ws = new WebSocket("ws://localhost:8000/api/get_board");
     ws.onmessage = event => {
-      let board = JSON.parse(event.data);
-      this.boarddata = Object.assign(BoardConfiguration, board);
+      let board = Object.assign(new BoardConfiguration(null, null), JSON.parse(event.data));
+      this.boarddata = board;
+      console.log(board);
     }
   }
 }

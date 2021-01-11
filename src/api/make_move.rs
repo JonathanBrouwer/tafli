@@ -1,13 +1,13 @@
-use actix::Addr;
-use actix_web::{get, post, web};
+use actix_web::{get, web};
 
-use crate::api::board_broadcast_server::{BoardBroadcast, ReceiveBoard};
+use crate::api::board_broadcast_server::{ReceiveBoard};
 use crate::api::make_move::MakeMoveResponse::{ERROR, SUCCESS};
-use crate::state::TafliState;
+use crate::state;
+use crate::api::board_broadcast_server;
 
 #[get("/api/make_move")]
-pub async fn make_move(state: web::Data<TafliState>, input: web::Query<MakeMoveInput>, bc: web::Data<Addr<BoardBroadcast>>) -> web::Json<MakeMoveResponse> {
-    let mut board = state.board.lock().unwrap();
+pub async fn make_move(input: web::Query<MakeMoveInput>) -> web::Json<MakeMoveResponse> {
+    let mut board = state::state.board.lock().unwrap();
 
     let from = input.from();
     if from.is_err() { return web::Json(ERROR); }
@@ -16,7 +16,7 @@ pub async fn make_move(state: web::Data<TafliState>, input: web::Query<MakeMoveI
 
     let move_res = board.make_move(from.unwrap(), to.unwrap());
     if move_res.is_err() { return web::Json(ERROR); }
-    bc.do_send(ReceiveBoard { board: *board });
+    board_broadcast_server::board_broadcast.do_send(ReceiveBoard { board: *board });
     web::Json(SUCCESS)
 }
 

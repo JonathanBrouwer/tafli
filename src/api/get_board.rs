@@ -4,16 +4,17 @@ use actix_web_actors::ws;
 
 use crate::api::board_broadcast_server::{BoardBroadcast, Connect, Disconnect, ReceiveBoard};
 
+use crate::api::board_broadcast_server::board_broadcast;
+
 pub struct WsGetBoard {
-    id: usize,
-    server: Addr<BoardBroadcast>,
+    id: usize
 }
 
 impl Actor for WsGetBoard {
     type Context = ws::WebsocketContext<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
-        self.server
+        board_broadcast
             .send(Connect { addr: ctx.address().recipient() })
             .into_actor(self)
             .then(|res, act, ctx| {
@@ -26,7 +27,7 @@ impl Actor for WsGetBoard {
     }
 
     fn stopping(&mut self, _ctx: &mut Self::Context) -> Running {
-        self.server
+        board_broadcast
             .do_send(Disconnect { id: self.id });
         Running::Stop
     }
@@ -52,9 +53,8 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsGetBoard {
     }
 }
 
-pub async fn get_board(req: HttpRequest, stream: web::Payload, server: web::Data<Addr<BoardBroadcast>>) -> Result<HttpResponse, Error> {
+pub async fn get_board(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
     ws::start(WsGetBoard {
-        id: 0,
-        server: server.get_ref().clone(),
+        id: 0
     }, &req, stream)
 }

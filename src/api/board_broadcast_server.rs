@@ -3,8 +3,13 @@ use std::collections::HashMap;
 use actix::prelude::*;
 use rand::Rng;
 use rand::rngs::ThreadRng;
+use crate::state;
 
 use crate::tafl::board::BoardConfiguration;
+
+lazy_static! {
+    pub static ref board_broadcast: Addr<BoardBroadcast> = BoardBroadcast::new().start();
+}
 
 pub struct BoardBroadcast {
     sessions: HashMap<usize, Recipient<ReceiveBoard>>,
@@ -29,6 +34,10 @@ impl Handler<Connect> for BoardBroadcast {
 
     fn handle(&mut self, msg: Connect, _: &mut Context<Self>) -> Self::Result {
         println!("Someone joined");
+
+        // send initial state
+        let cur_board = *state::state.board.lock().unwrap();
+        let _ = msg.addr.do_send(ReceiveBoard { board: cur_board });
 
         // register session with random id
         let id = self.rng.gen::<usize>();
