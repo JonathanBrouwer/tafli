@@ -39,7 +39,11 @@ export default {
         this.active_square = null;
         return;
       }
-      if (this.active_square === null || this.state.fields[x][y] !== FieldState.Empty) {
+      if (this.active_square === null) {
+        if (this.state.fields[x][y] === FieldState.Empty) {
+          this.active_square = null;
+          return;
+        }
         if ((this.state.fields[x][y] === FieldState.WhitePiece || this.state.fields[x][y] === FieldState.WhiteKing) && this.state.turn === Player.Black) {
           this.active_square = null;
           return;
@@ -50,12 +54,19 @@ export default {
         }
         this.active_square = [x, y];
       } else {
+        if (this.state.fields[x][y] !== FieldState.Empty) {
+          this.active_square = [x, y];
+          return;
+        }
+
         let from = this.active_square;
         let to = [x, y];
         fetch("http://localhost:8000/api/make_move?from=" + from[0] + "," + from[1] + "&to=" + to[0] + "," + to[1])
             .then(res => res.json())
             .then(data => {
-              this.boarddata = Object.assign(BoardConfiguration, data);
+              if (data !== "SUCCESS") {
+                window.alert("Illegal move.");
+              }
             });
         this.active_square = null;
       }
