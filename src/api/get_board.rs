@@ -44,12 +44,9 @@ impl Handler<ReceiveBoard> for WsGetBoard {
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsGetBoard {
     fn handle(
         &mut self,
-        msg: Result<ws::Message, ws::ProtocolError>,
+        _msg: Result<ws::Message, ws::ProtocolError>,
         _ctx: &mut Self::Context,
     ) {
-        if msg.is_ok() {
-            println!("Received {:?}", msg.unwrap())
-        }
     }
 }
 

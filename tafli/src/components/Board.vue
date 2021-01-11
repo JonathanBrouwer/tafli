@@ -3,7 +3,7 @@
     <div v-for="y in 11" :key="y" class="row g-0 board-row">
       <div v-for="x in 11" :key="x"
            class="col board-tile"
-           v-bind:class="{ 'selected': should_highlight(x-1, y-1), 'legal-move': should_show_legal(x-1, y-1) }"
+           v-bind:class="{ 'selected': should_show_selected(x-1, y-1), 'legal-move': should_show_legal(x-1, y-1) }"
            v-on:click="click_square(x-1, y-1)">
         <div v-if="state.fields[x - 1][y - 1] === FieldState.WhitePiece" class="board-piece board-piece-white"></div>
         <div v-if="state.fields[x - 1][y - 1] === FieldState.WhiteKing"
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import {BoardConfiguration, FieldState, player, Player} from "../ts/board_configuration";
+import {BoardConfiguration, FieldState, player} from "../ts/board_configuration";
 
 export default {
   name: 'board',
@@ -77,7 +77,7 @@ export default {
             this.legal_moves = data.moves;
           });
     },
-    should_highlight(x, y) {
+    should_show_selected(x, y) {
       return this.active_square !== null && !(this.active_square[0] !== x || this.active_square[1] !== y);
     },
     should_show_legal(x, y) {

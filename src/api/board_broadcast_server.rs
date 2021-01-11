@@ -33,8 +33,6 @@ impl Handler<Connect> for BoardBroadcast {
     type Result = usize;
 
     fn handle(&mut self, msg: Connect, _: &mut Context<Self>) -> Self::Result {
-        println!("Someone joined");
-
         // send initial state
         let cur_board = *state::state.board.lock().unwrap();
         let _ = msg.addr.do_send(ReceiveBoard { board: cur_board });
@@ -52,8 +50,6 @@ impl Handler<Disconnect> for BoardBroadcast {
     type Result = ();
 
     fn handle(&mut self, msg: Disconnect, _: &mut Context<Self>) {
-        println!("Someone disconnected");
-
         // remove address
         self.sessions.remove(&msg.id);
     }
@@ -63,8 +59,6 @@ impl Handler<ReceiveBoard> for BoardBroadcast {
     type Result = ();
 
     fn handle(&mut self, msg: ReceiveBoard, _ctx: &mut Context<Self>) {
-        println!("Broadcast");
-
         self.sessions.values().for_each(|ses| {
             let _ = ses.do_send(ReceiveBoard { board: msg.board });
         })
