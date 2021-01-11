@@ -11,7 +11,7 @@ pub struct BoardConfiguration {
 
 impl BoardConfiguration {
     /// Creates a new board in the starting configuration
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         BoardConfiguration {
             fields: include_str!("../assets/tafl_board.txt").lines().map(|line| {
                 line.chars().map(|char| {
@@ -29,7 +29,7 @@ impl BoardConfiguration {
     }
 
     /// Returns a Vec of all legal moves for the piece in the given position
-    fn legal_moves(&self, from: (usize, usize)) -> Vec<(usize, usize)> {
+    pub fn legal_moves(&self, from: (usize, usize)) -> Vec<(usize, usize)> {
         //Empty tiles cannot move
         if self.fields[from.0][from.1] == Empty { return Vec::new() }
 
@@ -55,7 +55,7 @@ impl BoardConfiguration {
     }
 
     /// Moves the piece in the `from` position to the `to` position
-    fn make_move(&mut self, from: (usize, usize), to: (usize, usize)) -> Result<(), MakeMoveError> {
+    pub fn make_move(&mut self, from: (usize, usize), to: (usize, usize)) -> Result<(), MakeMoveError> {
         //Check if move is legal
         if !self.legal_moves(from).contains(&to) { return Err(IllegalMove); }
         //Check if move is made by the right player
@@ -73,7 +73,7 @@ impl BoardConfiguration {
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
-enum MakeMoveError {
+pub enum MakeMoveError {
     IllegalMove,
     WrongPlayer
 }
