@@ -1,7 +1,9 @@
 <template>
   <div id="board">
     <div v-for="y in 11" :key="y" class="row g-0 board-row">
-      <div v-for="x in 11" :key="x" class="col board-tile">
+      <div v-for="x in 11" :key="x"
+           class="col board-tile" v-bind:class="{ 'selected': should_highlight(x-1, y-1) }"
+           v-on:click="click_square(x-1, y-1)">
         <div v-if="state.fields[x - 1][y - 1] === FieldState.WhitePiece" class="board-piece board-piece-white"></div>
         <div v-if="state.fields[x - 1][y - 1] === FieldState.WhiteKing"
              class="board-piece board-piece-white board-piece-king"></div>
@@ -18,7 +20,7 @@
 </template>
 
 <script>
-import {BoardConfiguration, FieldState} from "../ts/board_configuration";
+import {BoardConfiguration, FieldState, Player} from "../ts/board_configuration";
 
 export default {
   name: 'board',
@@ -27,7 +29,39 @@ export default {
   },
   data() {
     return {
-      FieldState: FieldState
+      FieldState: FieldState,
+      active_square: null
+    }
+  },
+  methods: {
+    click_square(x, y) {
+      if (this.active_square != null && this.active_square[0] === x && this.active_square[1] === y) {
+        this.active_square = null;
+        return;
+      }
+      if (this.active_square === null || this.state.fields[x][y] !== FieldState.Empty) {
+        if ((this.state.fields[x][y] === FieldState.WhitePiece || this.state.fields[x][y] === FieldState.WhiteKing) && this.state.turn === Player.Black) {
+          this.active_square = null;
+          return;
+        }
+        if (this.state.fields[x][y] === FieldState.BlackPiece && this.state.turn === Player.White) {
+          this.active_square = null;
+          return;
+        }
+        this.active_square = [x, y];
+      } else {
+        let from = this.active_square;
+        let to = [x, y];
+        fetch("http://localhost:8000/api/make_move?from=" + from[0] + "," + from[1] + "&to=" + to[0] + "," + to[1])
+            .then(res => res.json())
+            .then(data => {
+              this.boarddata = Object.assign(BoardConfiguration, data);
+            });
+        this.active_square = null;
+      }
+    },
+    should_highlight(x, y) {
+      return this.active_square !== null && !(this.active_square[0] !== x || this.active_square[1] !== y);
     }
   }
 }
@@ -55,7 +89,7 @@ export default {
 #board .board-row:nth-child(1) .board-tile:nth-child(11),
 #board .board-row:nth-child(11) .board-tile:nth-child(11),
 #board .board-row:nth-child(6) .board-tile:nth-child(6) {
-  background: rgba(210, 90, 10, .3) !important;
+  background: rgba(210, 90, 10, .3);
 }
 
 .board-tile {
@@ -102,5 +136,9 @@ export default {
   width: 50%;
   height: 50%;
   background: #111;
+}
+
+#board .board-row .board-tile.selected {
+  background: rgba(40, 167, 69, .6) !important;
 }
 </style>

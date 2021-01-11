@@ -36,11 +36,10 @@ impl MakeMoveInput {
     }
 
     fn convert_to_coord(inp: &String) -> Result<(usize, usize), ()> {
-        let x = inp.chars().next().ok_or(())? as isize - 'A' as isize;
-        if x < 0 || x >= 11 { return Err(()); }
-        let y = 11 - (inp.chars().nth(1).ok_or(())?.to_digit(10).ok_or(())? as isize);
-        if y < 0 || y >= 11 { return Err(()); }
-        Ok((x as usize, y as usize))
+        if !inp.contains(",") { return Err(()); }
+        let x: usize = inp.split(",").next().ok_or(())?.parse().ok().ok_or(())?;
+        let y: usize = inp.split(",").nth(1).ok_or(())?.parse().ok().ok_or(())?;
+        return Ok((x,y));
     }
 }
 

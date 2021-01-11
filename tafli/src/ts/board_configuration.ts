@@ -16,5 +16,5 @@ export enum FieldState {
 }
 
 export enum Player {
-    White, Black
+    White = "White", Black = "Black"
 }
