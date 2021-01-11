@@ -1,12 +1,13 @@
-use crate::tafl::board::Player::{White, Black};
-use crate::tafl::board::FieldState::{WhitePiece, WhiteKing, BlackPiece, Empty};
 use std::convert::TryInto;
+
+use crate::tafl::board::FieldState::{BlackPiece, Empty, WhiteKing, WhitePiece};
 use crate::tafl::board::MakeMoveError::{IllegalMove, WrongPlayer};
+use crate::tafl::board::Player::{Black, White};
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
 pub struct BoardConfiguration {
     fields: [[FieldState; 11]; 11],
-    turn: Player
+    turn: Player,
 }
 
 impl BoardConfiguration {
@@ -24,29 +25,29 @@ impl BoardConfiguration {
                     }
                 }).collect::<Vec<_>>().as_slice().try_into().unwrap()
             }).collect::<Vec<_>>().as_slice().try_into().unwrap(),
-            turn: Player::Black
+            turn: Player::Black,
         }
     }
 
     /// Returns a Vec of all legal moves for the piece in the given position
     pub fn legal_moves(&self, from: (usize, usize)) -> Vec<(usize, usize)> {
         //Empty tiles cannot move
-        if self.fields[from.0][from.1] == Empty { return Vec::new() }
+        if self.fields[from.0][from.1] == Empty { return Vec::new(); }
 
         //For each wind direction, iterate
-        [(1,0), (-1, 0), (0, 1), (0, -1)].iter().map(|dir| {
+        [(1, 0), (-1, 0), (0, 1), (0, -1)].iter().map(|dir| {
             //How many times to move in this direction from the start
             (1..)
                 //Map the count to the position in this direction
-                .map(move |count| (from.0 as isize + count*dir.0, from.1 as isize + count*dir.1))
+                .map(move |count| (from.0 as isize + count * dir.0, from.1 as isize + count * dir.1))
 
                 //Take while the squares are in the board
-                .take_while(|pos| {pos.0 >= 0 && pos.1 >= 0 && pos.0 < 11 && pos.1 < 11 })
+                .take_while(|pos| { pos.0 >= 0 && pos.1 >= 0 && pos.0 < 11 && pos.1 < 11 })
                 //Take while the squares are empty
                 .take_while(|pos| { self.fields[pos.0 as usize][pos.1 as usize] == Empty })
                 //If this is not the king, we are not allowed to move on the special squares
                 .take_while(|pos| {
-                    self.fields[from.0][from.1] == WhiteKing || ![(0, 0), (0, 10), (10, 0), (10, 10), (5,5)].contains(pos)
+                    self.fields[from.0][from.1] == WhiteKing || ![(0, 0), (0, 10), (10, 0), (10, 10), (5, 5)].contains(pos)
                 })
 
                 //Map to (usize, usize)
@@ -75,12 +76,13 @@ impl BoardConfiguration {
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub enum MakeMoveError {
     IllegalMove,
-    WrongPlayer
+    WrongPlayer,
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
 enum Player {
-    White, Black
+    White,
+    Black,
 }
 
 impl Player {
@@ -97,7 +99,7 @@ enum FieldState {
     WhiteKing,
     WhitePiece,
     BlackPiece,
-    Empty
+    Empty,
 }
 
 impl FieldState {
@@ -138,8 +140,10 @@ mod test {
     fn test_make_move() {
         let mut board = BoardConfiguration::new();
         assert_eq!(Err(IllegalMove), board.make_move((0, 0), (1, 0)));
-        assert_eq!(board.fields[3][0], BlackPiece); assert_eq!(board.fields[2][0], Empty);
+        assert_eq!(board.fields[3][0], BlackPiece);
+        assert_eq!(board.fields[2][0], Empty);
         assert_eq!(Ok(()), board.make_move((3, 0), (2, 0)));
-        assert_eq!(board.fields[3][0], Empty); assert_eq!(board.fields[2][0], BlackPiece);
+        assert_eq!(board.fields[3][0], Empty);
+        assert_eq!(board.fields[2][0], BlackPiece);
     }
 }

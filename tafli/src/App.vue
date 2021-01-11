@@ -15,7 +15,7 @@
 
 import Board from "@/components/Board";
 import Navbar from "@/components/Navbar";
-import {BoardConfiguration, Player, FieldState} from "./ts/board_configuration";
+import {BoardConfiguration, FieldState, Player} from "./ts/board_configuration";
 
 export default {
   name: 'App',
@@ -37,11 +37,11 @@ export default {
     }
   },
   mounted() {
-    fetch("http://localhost:8000/api/get_board")
-        .then(res => res.json())
-        .then(data => {
-          this.boarddata = Object.assign(BoardConfiguration, data);
-        });
+    let ws = new WebSocket("ws://localhost:8000/api/get_board");
+    ws.onmessage = event => {
+      let board = JSON.parse(event.data);
+      this.boarddata = Object.assign(BoardConfiguration, board);
+    }
   }
 }
 </script>
