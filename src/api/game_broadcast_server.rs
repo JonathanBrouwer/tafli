@@ -35,8 +35,8 @@ impl Handler<Connect> for BoardBroadcast {
 
     fn handle(&mut self, msg: Connect, _: &mut Context<Self>) -> Self::Result {
         // send initial state
-        let cur_game = *state::state.game.lock().unwrap();
-        let _ = msg.addr.do_send(ReceiveGame { game: cur_game });
+        let cur_game = state::state.game.lock().unwrap();
+        let _ = msg.addr.do_send(ReceiveGame { game: cur_game.clone() });
 
         // register session with random id
         let id = self.rng.gen::<usize>();
@@ -61,7 +61,7 @@ impl Handler<ReceiveGame> for BoardBroadcast {
 
     fn handle(&mut self, msg: ReceiveGame, _ctx: &mut Context<Self>) {
         self.sessions.values().for_each(|ses| {
-            let _ = ses.do_send(ReceiveGame { game: msg.game });
+            let _ = ses.do_send(ReceiveGame { game: msg.game.clone() });
         })
     }
 }
