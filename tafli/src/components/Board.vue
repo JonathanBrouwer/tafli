@@ -3,7 +3,7 @@
     <div v-for="y in 11" :key="y" class="row g-0 board-row">
       <div v-for="x in 11" :key="x"
            class="col board-tile"
-           v-bind:class="{ 'selected': should_show_selected(x-1, y-1), 'legal-move': should_show_legal(x-1, y-1) }"
+           v-bind:class="color_tile(x-1, y-1)"
            v-on:click="click_square(x-1, y-1)">
         <div v-if="game.board.fields[x - 1][y - 1] === FieldState.WhitePiece"
              class="board-piece board-piece-white"></div>
@@ -40,6 +40,11 @@ export default {
   },
   methods: {
     click_square(x, y) {
+      if (this.game.status !== 'Playing') {
+        this.active_square = null;
+        this.legal_moves = [];
+        return;
+      }
       //First move
       if (this.active_square === null) {
         //If we don't click on our own piece
@@ -80,11 +85,15 @@ export default {
             this.legal_moves = data.moves;
           });
     },
-    should_show_selected(x, y) {
-      return this.active_square !== null && !(this.active_square[0] !== x || this.active_square[1] !== y);
-    },
-    should_show_legal(x, y) {
-      return this.legal_moves.filter(m => m[0] === x && m[1] === y).length > 0
+    color_tile(x, y) {
+      return {
+        'selected': this.active_square !== null && !(this.active_square[0] !== x || this.active_square[1] !== y),
+        'legal-move': this.legal_moves.filter(m => m[0] === x && m[1] === y).length > 0,
+        'prev-move': this.game !== null && this.game.prev_move_info.last_move !== null &&
+            ((this.game.prev_move_info.last_move[0][0] === x && this.game.prev_move_info.last_move[0][1] === y) ||
+                (this.game.prev_move_info.last_move[1][0] === x && this.game.prev_move_info.last_move[1][1] === y)),
+        'captured': this.game !== null && this.game.prev_move_info.captures.filter(p => p[0] === x && p[1] === y).length > 0
+      }
     }
   }
 }
@@ -161,11 +170,18 @@ export default {
   background: #111;
 }
 
-#board .board-row .board-tile.selected {
+.board-tile.selected {
   background: rgba(40, 167, 69, .6) !important;
 }
 
-#board .board-row .board-tile.legal-move {
+.board-tile.legal-move {
   background: rgba(40, 167, 69, .2) !important;
+}
+
+.board-tile.prev-move {
+  background: rgb(207, 250, 248) !important;
+}
+.board-tile.captured {
+  background: rgb(248, 213, 213) !important;
 }
 </style>
