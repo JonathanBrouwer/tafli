@@ -1,9 +1,9 @@
 xxxBBBBBxxx
-xxxxxBxBxxx
-xxxxxxBKBxx
+xxxxxBxxxxx
+xxxxxxxxxxx
 BxxxxWxxxxB
-BxxxWWWBxxB
-BBxWWxWWxBB
+BxxxWWWxxxB
+BBxWWKWWxBB
 BxxxWWWxxxB
 BxxxxWxxxxB
 xxxxxxxxxxx
