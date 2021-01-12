@@ -1,6 +1,5 @@
 use std::sync::Mutex;
 
-use crate::tafl::board::BoardConfiguration;
 use crate::tafl::game::Game;
 
 lazy_static! {

@@ -3,7 +3,6 @@ use actix_web::{Error, HttpRequest, HttpResponse, web};
 use actix_web_actors::ws;
 
 use crate::api::game_broadcast_server::{Connect, Disconnect, ReceiveGame};
-
 use crate::api::game_broadcast_server::board_broadcast;
 
 pub struct WsGetGame {
@@ -46,8 +45,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsGetGame {
         &mut self,
         _msg: Result<ws::Message, ws::ProtocolError>,
         _ctx: &mut Self::Context,
-    ) {
-    }
+    ) {}
 }
 
 pub async fn get_game(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {

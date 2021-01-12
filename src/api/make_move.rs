@@ -1,9 +1,9 @@
 use actix_web::{get, web};
 
-use crate::api::game_broadcast_server::{ReceiveGame};
+use crate::api::game_broadcast_server::ReceiveGame;
+use crate::api::game_broadcast_server;
 use crate::api::make_move::MakeMoveResponse::{ERROR, SUCCESS};
 use crate::state;
-use crate::api::game_broadcast_server;
 
 #[get("/api/make_move")]
 pub async fn make_move(input: web::Query<MakeMoveInput>) -> web::Json<MakeMoveResponse> {
@@ -39,7 +39,7 @@ impl MakeMoveInput {
         if !inp.contains(",") { return Err(()); }
         let x: usize = inp.split(",").next().ok_or(())?.parse().ok().ok_or(())?;
         let y: usize = inp.split(",").nth(1).ok_or(())?.parse().ok().ok_or(())?;
-        return Ok((x,y));
+        return Ok((x, y));
     }
 }
 

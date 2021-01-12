@@ -1,6 +1,7 @@
+use std::ops::{Index, IndexMut};
+
 use crate::tafl::board::FieldState::{BlackPiece, Empty, WhiteKing, WhitePiece};
 use crate::tafl::board::Player::{Black, White};
-use std::ops::{Index, IndexMut};
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
 pub struct BoardConfiguration {
@@ -29,7 +30,7 @@ impl BoardConfiguration {
             }
         }
 
-        BoardConfiguration { fields, turn: Player::Black, }
+        BoardConfiguration { fields, turn: Player::Black }
     }
 
     pub fn special_squares() -> [(usize, usize); 5] {

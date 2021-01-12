@@ -1,14 +1,14 @@
 use std::collections::VecDeque;
 
-use crate::tafl::board::BoardConfiguration;
-use crate::tafl::board::FieldState::{Empty, BlackPiece, WhitePiece};
-use crate::tafl::rules::rule::Rule;
+use crate::tafl::board::FieldState::Empty;
 use crate::tafl::game::Game;
+use crate::tafl::rules::rule::Rule;
 
 pub struct ShieldWallRule;
 
 impl ShieldWallRule {
-    fn check(&self, board: &mut BoardConfiguration, to: (usize, usize), start: (usize, usize)) {
+    fn check(&self, game: &mut Game, to: (usize, usize), start: (usize, usize)) {
+        let board = game.board;
         if board[start] == Empty { return; }
         if board[start].player().unwrap() == board[to].player().unwrap() { return; }
 
@@ -54,7 +54,7 @@ impl ShieldWallRule {
         //If we didnt fail, this is a valid shield capture. Capture all the pieces
         if !fail {
             for piece in captured_group {
-                board[piece] = Empty;
+                game.capture(piece);
             }
         }
     }
@@ -65,38 +65,44 @@ impl Rule for ShieldWallRule {
         //Check top or bottom wall
         if to.1 == 0 || to.1 == 10 {
             //Check to the left
-            if to.0 != 0 { self.check(&mut game.board, to, (to.0-1, to.1))}
+            if to.0 != 0 { self.check(game, to, (to.0 - 1, to.1)) }
             //Check to the Right
-            if to.0 != 10 { self.check(&mut game.board, to, (to.0+1, to.1))}
+            if to.0 != 10 { self.check(game, to, (to.0 + 1, to.1)) }
         }
 
         //Check left or right wall
         if to.0 == 0 || to.0 == 10 {
             //Check to the top
-            if to.1 != 0 { self.check(&mut game.board, to, (to.0, to.1-1))}
+            if to.1 != 0 { self.check(game, to, (to.0, to.1 - 1)) }
             //Check to the bottom
-            if to.1 != 10 { self.check(&mut game.board, to, (to.0, to.1+1))}
+            if to.1 != 10 { self.check(game, to, (to.0, to.1 + 1)) }
         }
     }
 }
 
-#[test]
-fn test_shield_wall() {
-    let mut game = Game::from_file(include_str!("../../assets/shield_wall_test.txt"));
-    assert_eq!(Ok(()), game.make_move((3, 0), (2, 0)));
-    assert_eq!(Ok(()), game.make_move((5, 2), (10, 2)));
-    assert_eq!(BlackPiece, game.board.fields[10][3]);
-    assert_eq!(BlackPiece, game.board.fields[10][4]);
-    assert_eq!(BlackPiece, game.board.fields[10][5]);
-    assert_eq!(BlackPiece, game.board.fields[10][6]);
-    assert_eq!(BlackPiece, game.board.fields[10][7]);
-    assert_eq!(Ok(()), game.make_move((2, 0), (3, 0)));
-    assert_eq!(Ok(()), game.make_move((5, 8), (10, 8)));
-    assert_eq!(WhitePiece, game.board.fields[10][2]);
-    assert_eq!(Empty, game.board.fields[10][3]);
-    assert_eq!(Empty, game.board.fields[10][4]);
-    assert_eq!(Empty, game.board.fields[10][5]);
-    assert_eq!(Empty, game.board.fields[10][6]);
-    assert_eq!(Empty, game.board.fields[10][7]);
-    assert_eq!(WhitePiece, game.board.fields[10][8]);
+#[cfg(test)]
+mod test {
+    use crate::tafl::board::FieldState::{BlackPiece, Empty, WhitePiece};
+    use crate::tafl::game::Game;
+
+    #[test]
+    fn test_shield_wall() {
+        let mut game = Game::from_file(include_str!("../../assets/shield_wall_test.txt"));
+        assert_eq!(Ok(()), game.make_move((3, 0), (2, 0)));
+        assert_eq!(Ok(()), game.make_move((5, 2), (10, 2)));
+        assert_eq!(BlackPiece, game.board.fields[10][3]);
+        assert_eq!(BlackPiece, game.board.fields[10][4]);
+        assert_eq!(BlackPiece, game.board.fields[10][5]);
+        assert_eq!(BlackPiece, game.board.fields[10][6]);
+        assert_eq!(BlackPiece, game.board.fields[10][7]);
+        assert_eq!(Ok(()), game.make_move((2, 0), (3, 0)));
+        assert_eq!(Ok(()), game.make_move((5, 8), (10, 8)));
+        assert_eq!(WhitePiece, game.board.fields[10][2]);
+        assert_eq!(Empty, game.board.fields[10][3]);
+        assert_eq!(Empty, game.board.fields[10][4]);
+        assert_eq!(Empty, game.board.fields[10][5]);
+        assert_eq!(Empty, game.board.fields[10][6]);
+        assert_eq!(Empty, game.board.fields[10][7]);
+        assert_eq!(WhitePiece, game.board.fields[10][8]);
+    }
 }

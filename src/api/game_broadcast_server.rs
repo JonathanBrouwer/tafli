@@ -3,9 +3,8 @@ use std::collections::HashMap;
 use actix::prelude::*;
 use rand::Rng;
 use rand::rngs::ThreadRng;
-use crate::state;
 
-use crate::tafl::board::BoardConfiguration;
+use crate::state;
 use crate::tafl::game::Game;
 
 lazy_static! {

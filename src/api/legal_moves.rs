@@ -1,17 +1,17 @@
 use actix_web::{get, web};
 
-use crate::state;
 use crate::api::make_move::MakeMoveInput;
+use crate::state;
 
 #[get("/api/legal_moves")]
 pub async fn legal_moves(input: web::Query<LegalMovesInput>) -> web::Json<LegalMovesResponse> {
     let game = state::state.game.lock().unwrap();
 
     let pos = input.pos();
-    if pos.is_err() { return web::Json(LegalMovesResponse{ moves: Vec::new()}); }
+    if pos.is_err() { return web::Json(LegalMovesResponse { moves: Vec::new() }); }
 
     let moves = game.legal_moves(pos.unwrap());
-    web::Json(LegalMovesResponse{ moves })
+    web::Json(LegalMovesResponse { moves })
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]

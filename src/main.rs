@@ -1,9 +1,9 @@
 extern crate actix_web;
 extern crate actix_web_actors;
 #[macro_use]
-extern crate serde;
-#[macro_use]
 extern crate lazy_static;
+#[macro_use]
+extern crate serde;
 
 use actix_cors::Cors;
 use actix_files as fs;
@@ -12,6 +12,7 @@ use actix_web::{App, HttpServer, middleware::Logger, web};
 mod tafl;
 mod api;
 pub mod state;
+mod prev_move_info;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

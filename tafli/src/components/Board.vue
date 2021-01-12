@@ -5,10 +5,12 @@
            class="col board-tile"
            v-bind:class="{ 'selected': should_show_selected(x-1, y-1), 'legal-move': should_show_legal(x-1, y-1) }"
            v-on:click="click_square(x-1, y-1)">
-        <div v-if="game.board.fields[x - 1][y - 1] === FieldState.WhitePiece" class="board-piece board-piece-white"></div>
+        <div v-if="game.board.fields[x - 1][y - 1] === FieldState.WhitePiece"
+             class="board-piece board-piece-white"></div>
         <div v-if="game.board.fields[x - 1][y - 1] === FieldState.WhiteKing"
              class="board-piece board-piece-white board-piece-king"></div>
-        <div v-if="game.board.fields[x - 1][y - 1] === FieldState.BlackPiece" class="board-piece board-piece-black"></div>
+        <div v-if="game.board.fields[x - 1][y - 1] === FieldState.BlackPiece"
+             class="board-piece board-piece-black"></div>
       </div>
       <div class="col count row-count">{{ 12 - y }}</div>
     </div>
@@ -162,6 +164,7 @@ export default {
 #board .board-row .board-tile.selected {
   background: rgba(40, 167, 69, .6) !important;
 }
+
 #board .board-row .board-tile.legal-move {
   background: rgba(40, 167, 69, .2) !important;
 }

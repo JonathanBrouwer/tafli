@@ -1,18 +1,18 @@
+use crate::tafl::board::BoardConfiguration;
+use crate::tafl::board::FieldState::{Empty, WhiteKing};
 use crate::tafl::game::Game;
+use crate::tafl::game_move::MakeMoveError::{IllegalMove, WrongPlayer};
 use crate::tafl::rules::capture_rule::CaptureRule;
+use crate::tafl::rules::rule::Rule;
 use crate::tafl::rules::shield_wall_rule::ShieldWallRule;
 use crate::tafl::rules::win_white_corner::WinWhiteCorner;
-use crate::tafl::rules::rule::Rule;
-use crate::tafl::board::FieldState::{Empty, WhiteKing};
-use crate::tafl::game_move::MakeMoveError::{IllegalMove, WrongPlayer};
-use crate::tafl::board::BoardConfiguration;
 
 impl Game {
     pub fn rules() -> Vec<Box<dyn Rule>> {
         vec![
             Box::new(CaptureRule {}),
             Box::new(ShieldWallRule {}),
-            Box::new(WinWhiteCorner{})
+            Box::new(WinWhiteCorner {})
         ]
     }
 
@@ -48,6 +48,10 @@ impl Game {
         //Check if move is made by the right player
         if self.board[from].player().unwrap() != self.board.turn { return Err(WrongPlayer); }
 
+        //Update last move info
+        self.prev_move_info.last_move = Some((from, to));
+        self.prev_move_info.captures.clear();
+
         //Move piece
         self.board[to] = self.board[from];
         self.board[from] = Empty;
@@ -62,6 +66,12 @@ impl Game {
 
         return Ok(());
     }
+
+    pub fn capture(&mut self, pos: (usize, usize)) {
+        if self.board[pos] == Empty { panic!("Illegal capture!") }
+        self.board[pos] = Empty;
+        self.prev_move_info.captures.push(pos);
+    }
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
@@ -72,9 +82,10 @@ pub enum MakeMoveError {
 
 #[cfg(test)]
 mod test {
-    use super::*;
-    use crate::tafl::game_move::MakeMoveError::IllegalMove;
     use crate::tafl::board::FieldState::{BlackPiece, Empty};
+    use crate::tafl::game_move::MakeMoveError::IllegalMove;
+
+    use super::*;
 
     #[test]
     fn test_legal_moves() {
