@@ -1,12 +1,12 @@
 use std::collections::VecDeque;
 
 use crate::tafl::board::BoardConfiguration;
-use crate::tafl::board::FieldState::Empty;
+use crate::tafl::board::FieldState::{Empty, BlackPiece, WhitePiece};
 use crate::tafl::rules::rule::Rule;
 
-pub struct CaptureRule;
+pub struct ShieldWallRule;
 
-impl CaptureRule {
+impl ShieldWallRule {
     fn check(&self, board: &mut BoardConfiguration, to: (usize, usize), start: (usize, usize)) {
         if board.fields[start.0][start.1] == Empty { return; }
         if board.fields[start.0][start.1].player().unwrap() == board.fields[to.0][to.1].player().unwrap() { return; }
@@ -17,6 +17,8 @@ impl CaptureRule {
         //Queue will contain all the pieces yet to be processed
         let mut queue = VecDeque::new();
         queue.push_back(start);
+        //Keep track if we failed
+        let mut fail = false;
 
         while !queue.is_empty() {
             //Add this to the captured group
@@ -32,32 +34,35 @@ impl CaptureRule {
 
                     //Check type of piece
                     match board.fields[nb.0][nb.1].player() {
+                        //Can we use this neighbour as part of the wall?
+                        _ if board.can_capture_with(start, nb) => {}
                         //If neighbour is air, group is not walled
-                        None => return,
+                        None => fail = true,
                         //If neighbour is of the same team, and not seen earlier, add it to the queue
                         Some(player) if player == board.fields[start.0][start.1].player().unwrap() => {
                             if !queue.contains(&nb) && !captured_group.contains(&nb) {
                                 queue.push_back(nb);
                             }
-                        },
-                        //If neighbour is part of the wall, do nothing
-                        Some(_) => {}
+                        }
+                        _ => unreachable!()
                     };
                 }
             });
         }
 
-        //We never returned, so this is a valid shield capture. Capture all the pieces
-        for piece in captured_group {
-            board.fields[piece.0][piece.1] = Empty;
+        //If we didnt fail, this is a valid shield capture. Capture all the pieces
+        if !fail {
+            for piece in captured_group {
+                board.fields[piece.0][piece.1] = Empty;
+            }
         }
     }
 }
 
-impl Rule for CaptureRule {
+impl Rule for ShieldWallRule {
     fn make_move(&self, board: &mut BoardConfiguration, _from: (usize, usize), to: (usize, usize)) {
         //Check top or bottom wall
-        if to.1 == 0 || to.1 == 12 {
+        if to.1 == 0 || to.1 == 10 {
             //Check to the left
             if to.0 != 0 { self.check(board, to, (to.0-1, to.1))}
             //Check to the Right
@@ -65,15 +70,32 @@ impl Rule for CaptureRule {
         }
 
         //Check left or right wall
-        if to.0 == 0 || to.0 == 12 {
-            //Check to the left
+        if to.0 == 0 || to.0 == 10 {
+            //Check to the top
             if to.1 != 0 { self.check(board, to, (to.0, to.1-1))}
-            //Check to the Right
+            //Check to the bottom
             if to.1 != 10 { self.check(board, to, (to.0, to.1+1))}
         }
     }
 }
 
-//TODO capture using special square
 #[test]
-fn test_shield_wall() {}
+fn test_shield_wall() {
+    let mut board = BoardConfiguration::from_file(include_str!("../../assets/shield_wall_test.txt"));
+    assert_eq!(Ok(()), board.make_move((3, 0), (2, 0)));
+    assert_eq!(Ok(()), board.make_move((5, 2), (10, 2)));
+    assert_eq!(BlackPiece, board.fields[10][3]);
+    assert_eq!(BlackPiece, board.fields[10][4]);
+    assert_eq!(BlackPiece, board.fields[10][5]);
+    assert_eq!(BlackPiece, board.fields[10][6]);
+    assert_eq!(BlackPiece, board.fields[10][7]);
+    assert_eq!(Ok(()), board.make_move((2, 0), (3, 0)));
+    assert_eq!(Ok(()), board.make_move((5, 8), (10, 8)));
+    assert_eq!(WhitePiece, board.fields[10][2]);
+    assert_eq!(Empty, board.fields[10][3]);
+    assert_eq!(Empty, board.fields[10][4]);
+    assert_eq!(Empty, board.fields[10][5]);
+    assert_eq!(Empty, board.fields[10][6]);
+    assert_eq!(Empty, board.fields[10][7]);
+    assert_eq!(WhitePiece, board.fields[10][8]);
+}

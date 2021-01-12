@@ -4,6 +4,7 @@ use crate::tafl::board::FieldState::{BlackPiece, Empty, WhiteKing, WhitePiece};
 use crate::tafl::board::MakeMoveError::{IllegalMove, WrongPlayer};
 use crate::tafl::board::Player::{Black, White};
 use crate::tafl::rules::capture_rule::CaptureRule;
+use crate::tafl::rules::shield_wall_rule::ShieldWallRule;
 use crate::tafl::rules::rule::Rule;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
@@ -15,24 +16,32 @@ pub struct BoardConfiguration {
 impl BoardConfiguration {
     /// Creates a new board in the starting configuration
     pub fn new() -> Self {
-        BoardConfiguration {
-            fields: include_str!("../assets/tafl_board.txt").lines().map(|line| {
-                line.chars().map(|char| {
-                    match char {
-                        'W' => WhitePiece,
-                        'K' => WhiteKing,
-                        'B' => BlackPiece,
-                        'x' => Empty,
-                        _ => unreachable!()
-                    }
-                }).collect::<Vec<_>>().as_slice().try_into().unwrap()
-            }).collect::<Vec<_>>().as_slice().try_into().unwrap(),
-            turn: Player::Black,
+        Self::from_file(include_str!("../assets/tafl_board.txt"))
+    }
+
+    pub fn from_file(str: &'static str) -> Self {
+        let lines: Vec<_> = str.lines().collect();
+        let mut fields = [[Empty; 11]; 11];
+        for x in 0..11 {
+            for y in 0..11 {
+                fields[x][y] = match lines[y].chars().nth(x).unwrap() {
+                    'W' => WhitePiece,
+                    'K' => WhiteKing,
+                    'B' => BlackPiece,
+                    'x' => Empty,
+                    _ => unreachable!()
+                };
+            }
         }
+
+        BoardConfiguration { fields, turn: Player::Black, }
     }
 
     pub fn rules() -> Vec<Box<dyn Rule>> {
-        vec![Box::new(CaptureRule {})]
+        vec![
+            Box::new(CaptureRule {}),
+            Box::new(ShieldWallRule {})
+        ]
     }
 
     pub fn special_squares() -> [(usize, usize); 5] {
