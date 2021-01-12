@@ -10,7 +10,7 @@ pub async fn legal_moves(input: web::Query<LegalMovesInput>) -> web::Json<LegalM
     let pos = input.pos();
     if pos.is_err() { return web::Json(LegalMovesResponse{ moves: Vec::new()}); }
 
-    let moves = game.board.legal_moves(pos.unwrap());
+    let moves = game.legal_moves(pos.unwrap());
     web::Json(LegalMovesResponse{ moves })
 }
 

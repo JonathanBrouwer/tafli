@@ -14,7 +14,7 @@ pub async fn make_move(input: web::Query<MakeMoveInput>) -> web::Json<MakeMoveRe
     let to = input.to();
     if to.is_err() { return web::Json(ERROR); }
 
-    let move_res = game.board.make_move(from.unwrap(), to.unwrap());
+    let move_res = game.make_move(from.unwrap(), to.unwrap());
     if move_res.is_err() { return web::Json(ERROR); }
     game_broadcast_server::board_broadcast.do_send(ReceiveGame { game: game.clone() });
     web::Json(SUCCESS)

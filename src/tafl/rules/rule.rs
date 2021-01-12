@@ -1,5 +1,5 @@
-use crate::tafl::board::BoardConfiguration;
+use crate::tafl::game::Game;
 
 pub trait Rule {
-    fn make_move(&self, board: &mut BoardConfiguration, from: (usize, usize), to: (usize, usize));
+    fn make_move(&self, game: &mut Game, from: (usize, usize), to: (usize, usize));
 }

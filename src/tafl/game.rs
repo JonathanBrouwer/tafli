@@ -13,6 +13,13 @@ impl Game {
             status: GameStatus::Playing
         }
     }
+
+    pub fn from_file(str: &'static str) -> Self {
+        Game {
+            board: BoardConfiguration::from_file(str),
+            status: GameStatus::Playing
+        }
+    }
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
