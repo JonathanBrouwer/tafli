@@ -3,11 +3,13 @@ use std::convert::TryInto;
 use crate::tafl::board::FieldState::{BlackPiece, Empty, WhiteKing, WhitePiece};
 use crate::tafl::board::MakeMoveError::{IllegalMove, WrongPlayer};
 use crate::tafl::board::Player::{Black, White};
+use crate::tafl::rules::rule::Rule;
+use crate::tafl::rules::capture_rule::CaptureRule;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
 pub struct BoardConfiguration {
-    fields: [[FieldState; 11]; 11],
-    turn: Player,
+    pub fields: [[FieldState; 11]; 11],
+    pub turn: Player,
 }
 
 impl BoardConfiguration {
@@ -27,6 +29,10 @@ impl BoardConfiguration {
             }).collect::<Vec<_>>().as_slice().try_into().unwrap(),
             turn: Player::Black,
         }
+    }
+
+    pub fn rules() -> Vec<Box<dyn Rule>> {
+        vec![Box::new(CaptureRule{})]
     }
 
     pub fn special_squares() -> [(usize, usize); 5] {
@@ -69,24 +75,9 @@ impl BoardConfiguration {
         self.fields[to.0][to.1] = self.fields[from.0][from.1];
         self.fields[from.0][from.1] = Empty;
 
-        //Check for direct captures
-        [(1, 0), (-1, 0), (0, 1), (0, -1)].iter().for_each(|dir| {
-            let p1 = ((to.0 as isize + dir.0), (to.1 as isize + dir.1));
-            let p2 = ((to.0 as isize + dir.0 * 2), (to.1 as isize + dir.1 * 2));
-
-            //If p2 is inside the map
-            if p2.0 >= 0 && p2.0 < 11 && p2.1 >= 0 && p2.1 < 11 {
-                let p1 = (p1.0 as usize, p1.1 as usize);
-                let p2 = (p2.0 as usize, p2.1 as usize);
-                //If both squares are not empty
-                if self.fields[p1.0][p1.1] != Empty && (Self::special_squares().contains(&p2) || self.fields[p2.0][p2.1] != Empty) {
-                    //If the piece at p1 is enemy, and the piece at p2 is friendly
-                    if self.fields[p1.0][p1.1].player().unwrap() != self.turn && (Self::special_squares().contains(&p2) || self.fields[p2.0][p2.1].player().unwrap() == self.turn) {
-                        //Capture p1
-                        self.fields[p1.0][p1.1] = Empty;
-                    }
-                }
-            }
+        //Apply rules
+        Self::rules().iter().for_each(|rule| {
+            rule.make_move(self, from, to);
         });
 
         //Switch turn
@@ -103,7 +94,7 @@ pub enum MakeMoveError {
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
-enum Player {
+pub enum Player {
     White,
     Black,
 }
@@ -118,7 +109,7 @@ impl Player {
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
-enum FieldState {
+pub enum FieldState {
     WhiteKing,
     WhitePiece,
     BlackPiece,
