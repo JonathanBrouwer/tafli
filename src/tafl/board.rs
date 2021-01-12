@@ -3,8 +3,8 @@ use std::convert::TryInto;
 use crate::tafl::board::FieldState::{BlackPiece, Empty, WhiteKing, WhitePiece};
 use crate::tafl::board::MakeMoveError::{IllegalMove, WrongPlayer};
 use crate::tafl::board::Player::{Black, White};
-use crate::tafl::rules::rule::Rule;
 use crate::tafl::rules::capture_rule::CaptureRule;
+use crate::tafl::rules::rule::Rule;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
 pub struct BoardConfiguration {
@@ -32,11 +32,24 @@ impl BoardConfiguration {
     }
 
     pub fn rules() -> Vec<Box<dyn Rule>> {
-        vec![Box::new(CaptureRule{})]
+        vec![Box::new(CaptureRule {})]
     }
 
     pub fn special_squares() -> [(usize, usize); 5] {
         return [(0, 0), (0, 10), (10, 0), (10, 10), (5, 5)];
+    }
+
+    pub fn can_capture_with(&self, to_capture: (usize, usize), capture_with: (usize, usize)) -> bool {
+        match (self.fields[to_capture.0][to_capture.1].player(),
+               self.fields[capture_with.0][capture_with.1].player(),
+               Self::special_squares().contains(&capture_with)) {
+            //Capture using friendly piece
+            (Some(p1), Some(p2), _) if p1 != p2 => true,
+            //Capture using special square, which does not contain their own piece
+            (Some(p1), p2, true) if Some(p1) != p2 => true,
+            //No other way to capture
+            _ => false
+        }
     }
 
     /// Returns a Vec of all legal moves for the piece in the given position
