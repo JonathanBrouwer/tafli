@@ -24,7 +24,7 @@ mod test {
 
     #[test]
     fn test_king_escape() {
-        let mut game = Game::from_file(include_str!("../../assets/win_white_corner_test.txt"));
+        let mut game = Game::from_file(include_str!("../../assets/test_win_white_corner.txt"));
         assert_eq!(Ok(()), game.make_move((3, 0), (2,0)));
         assert_eq!(Ok(()), game.make_move((1, 0), (0,0)));
         assert_eq!(game.status, Won(White, String::from("King reached the corner")))

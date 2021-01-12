@@ -6,13 +6,15 @@ use crate::tafl::rules::capture_rule::CaptureRule;
 use crate::tafl::rules::rule::Rule;
 use crate::tafl::rules::shield_wall_rule::ShieldWallRule;
 use crate::tafl::rules::win_white_corner::WinWhiteCorner;
+use crate::tafl::rules::win_black_surround_king::WinBlackSurroundKing;
 
 impl Game {
     pub fn rules() -> Vec<Box<dyn Rule>> {
         vec![
             Box::new(CaptureRule {}),
             Box::new(ShieldWallRule {}),
-            Box::new(WinWhiteCorner {})
+            Box::new(WinWhiteCorner {}),
+            Box::new(WinBlackSurroundKing{})
         ]
     }
 

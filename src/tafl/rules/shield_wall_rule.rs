@@ -87,7 +87,7 @@ mod test {
 
     #[test]
     fn test_shield_wall() {
-        let mut game = Game::from_file(include_str!("../../assets/shield_wall_test.txt"));
+        let mut game = Game::from_file(include_str!("../../assets/test_shield_wall.txt"));
         assert_eq!(Ok(()), game.make_move((3, 0), (2, 0)));
         assert_eq!(Ok(()), game.make_move((5, 2), (10, 2)));
         assert_eq!(BlackPiece, game.board.fields[10][3]);
