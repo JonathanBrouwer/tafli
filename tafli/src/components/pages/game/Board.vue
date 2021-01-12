@@ -23,13 +23,13 @@
 </template>
 
 <script>
-import {FieldState, player} from "../ts/board_configuration";
+import {FieldState, player} from "@/ts/board_configuration";
 import {Game} from "@/ts/game";
 
 export default {
   name: 'board',
   props: {
-    game: Game
+    game: Game,
   },
   data() {
     return {
@@ -71,7 +71,7 @@ export default {
         //Else, make a move
         let from = this.active_square;
         let to = [x, y];
-        fetch("http://192.168.2.19:8000/api/make_move?from=" + from[0] + "," + from[1] + "&to=" + to[0] + "," + to[1]);
+        fetch("http://86.83.105.238:8000/api/make_move?from=" + from[0] + "," + from[1] + "&to=" + to[0] + "," + to[1]);
         this.active_square = null;
         this.legal_moves = [];
       }
@@ -79,7 +79,7 @@ export default {
     select_square(x, y) {
       this.active_square = [x, y];
       this.legal_moves = [];
-      fetch("http://192.168.2.19:8000/api/legal_moves?pos=" + this.active_square[0] + "," + this.active_square[1])
+      fetch("http://86.83.105.238:8000/api/legal_moves?pos=" + this.active_square[0] + "," + this.active_square[1])
           .then(res => res.json())
           .then(data => {
             this.legal_moves = data.moves;

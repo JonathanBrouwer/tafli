@@ -14,6 +14,8 @@ mod api;
 pub mod state;
 mod prev_move_info;
 
+const ip: &str = "86.83.105.238";
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix=info");

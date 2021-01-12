@@ -1,54 +1,38 @@
 <template>
   <navbar></navbar>
-  <div class="container-fluid">
-    <div class="row justify-content-center">
-      <div class="col-12 col-lg-5 col-xl-3">
-        <meta-view :game="game"></meta-view>
-      </div>
-      <div class="col-12 col-lg-7 col-xl-5">
-        <board v-if="game !== null" :game="game"></board>
-        <span v-if="game === null">Loading...</span>
-      </div>
-    </div>
-  </div>
+  <component v-bind:is="CurrentComponent"></component>
 </template>
 
 <script>
 
-import Board from "@/components/Board";
 import Navbar from "@/components/Navbar";
-import {Game} from "@/ts/game";
-import {deserialize, plainToClass} from "class-transformer";
-import {BoardConfiguration} from "@/ts/board_configuration";
-import MetaView from "@/components/MetaView";
+import Game from "@/components/pages/game/Game";
+import Learn from "@/components/pages/Learn";
+import NotFound from "@/components/pages/NotFound";
+import * as Vue from "@vue/runtime-core";
+
+const routes = {
+  '/': Game,
+  '/learn': Learn
+}
 
 export default {
   name: 'App',
-  components: {Board, Navbar, MetaView},
+  components: {Navbar},
   data() {
     return {
-      game: null
+      currentRoute: window.location.pathname
     }
   },
-  mounted() {
-    let ws = new WebSocket("ws://192.168.2.19:8000/api/get_game");
-    ws.onmessage = event => {
-      let game = deserialize(Game, event.data);
-      game.board = plainToClass(BoardConfiguration, game.board);
-
-      this.game = game;
+  computed: {
+    CurrentComponent() {
+      return routes[this.currentRoute] || NotFound
     }
   }
 }
 </script>
 
 <style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 html, body, #app {
   height: 100%;
   background: #f0f0f0;

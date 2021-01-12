@@ -18,6 +18,7 @@ impl Rule for WinBlackSurroundKing {
                     game.board.can_capture_with((king.0 as usize, king.1 as usize), (nb.0 as usize, nb.1 as usize))
                 }) {
                     game.status = Won(Black, String::from("King was surrounded"));
+                    game.prev_move_info.captures.push((king.0 as usize, king.1 as usize));
                 }
             }
         });
