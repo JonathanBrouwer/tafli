@@ -1,13 +1,14 @@
 <template>
   <navbar></navbar>
   <div class="container-fluid">
-    <div class="row">
-      <div class="col-12 col-lg-7 order-lg-1 col-xl-5">
-        <board v-if="game !== null" :state="game.board"></board>
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-5 col-xl-3">
+        <meta-view :game="game"></meta-view>
+      </div>
+      <div class="col-12 col-lg-7 col-xl-5">
+        <board v-if="game !== null" :game="game"></board>
         <span v-if="game === null">Loading...</span>
       </div>
-      <div class="col-12 col-lg-5 order-lg-0 col-xl">Left</div>
-      <div class="col-12 col-lg-12 order-lg-2 col-xl"></div>
     </div>
   </div>
 </template>
@@ -19,17 +20,18 @@ import Navbar from "@/components/Navbar";
 import {Game} from "@/ts/game";
 import {deserialize, plainToClass} from "class-transformer";
 import {BoardConfiguration} from "@/ts/board_configuration";
+import MetaView from "@/components/MetaView";
 
 export default {
   name: 'App',
-  components: {Board, Navbar},
+  components: {Board, Navbar, MetaView},
   data() {
     return {
       game: null
     }
   },
   mounted() {
-    let ws = new WebSocket("ws://localhost:8000/api/get_game");
+    let ws = new WebSocket("ws://192.168.2.19:8000/api/get_game");
     ws.onmessage = event => {
       let game = deserialize(Game, event.data);
       game.board = plainToClass(BoardConfiguration, game.board);

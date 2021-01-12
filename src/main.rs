@@ -29,7 +29,7 @@ async fn main() -> std::io::Result<()> {
             .service(api::legal_moves::legal_moves)
             .service(fs::Files::new("/", "./tafli/dist").show_files_listing().index_file("index.html"))
     })
-        .bind(("127.0.0.1", 8000))?
+        .bind(("192.168.2.19", 8000))?
         .run()
         .await
 }

@@ -5,10 +5,10 @@
            class="col board-tile"
            v-bind:class="{ 'selected': should_show_selected(x-1, y-1), 'legal-move': should_show_legal(x-1, y-1) }"
            v-on:click="click_square(x-1, y-1)">
-        <div v-if="state.fields[x - 1][y - 1] === FieldState.WhitePiece" class="board-piece board-piece-white"></div>
-        <div v-if="state.fields[x - 1][y - 1] === FieldState.WhiteKing"
+        <div v-if="game.board.fields[x - 1][y - 1] === FieldState.WhitePiece" class="board-piece board-piece-white"></div>
+        <div v-if="game.board.fields[x - 1][y - 1] === FieldState.WhiteKing"
              class="board-piece board-piece-white board-piece-king"></div>
-        <div v-if="state.fields[x - 1][y - 1] === FieldState.BlackPiece" class="board-piece board-piece-black"></div>
+        <div v-if="game.board.fields[x - 1][y - 1] === FieldState.BlackPiece" class="board-piece board-piece-black"></div>
       </div>
       <div class="col count row-count">{{ 12 - y }}</div>
     </div>
@@ -21,12 +21,13 @@
 </template>
 
 <script>
-import {BoardConfiguration, FieldState, player} from "../ts/board_configuration";
+import {FieldState, player} from "../ts/board_configuration";
+import {Game} from "@/ts/game";
 
 export default {
   name: 'board',
   props: {
-    state: BoardConfiguration
+    game: Game
   },
   data() {
     return {
@@ -40,7 +41,7 @@ export default {
       //First move
       if (this.active_square === null) {
         //If we don't click on our own piece
-        if (player(this.state.fields[x][y]) !== this.state.turn) {
+        if (player(this.game.board.fields[x][y]) !== this.game.board.turn) {
           this.active_square = null;
           this.legal_moves = [];
           return;
@@ -56,14 +57,14 @@ export default {
           return;
         }
         //If we click another piece of ourself, select that
-        if (player(this.state.fields[x][y]) === this.state.turn) {
+        if (player(this.game.board.fields[x][y]) === this.game.board.turn) {
           this.select_square(x, y);
           return;
         }
         //Else, make a move
         let from = this.active_square;
         let to = [x, y];
-        fetch("http://localhost:8000/api/make_move?from=" + from[0] + "," + from[1] + "&to=" + to[0] + "," + to[1]);
+        fetch("http://192.168.2.19:8000/api/make_move?from=" + from[0] + "," + from[1] + "&to=" + to[0] + "," + to[1]);
         this.active_square = null;
         this.legal_moves = [];
       }
@@ -71,7 +72,7 @@ export default {
     select_square(x, y) {
       this.active_square = [x, y];
       this.legal_moves = [];
-      fetch("http://localhost:8000/api/legal_moves?pos=" + this.active_square[0] + "," + this.active_square[1])
+      fetch("http://192.168.2.19:8000/api/legal_moves?pos=" + this.active_square[0] + "," + this.active_square[1])
           .then(res => res.json())
           .then(data => {
             this.legal_moves = data.moves;
