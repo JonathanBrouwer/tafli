@@ -16,9 +16,9 @@ impl Rule for CaptureRule {
                 let p1 = (p1.0 as usize, p1.1 as usize);
                 let p2 = (p2.0 as usize, p2.1 as usize);
                 //If we can capture p1 with p2, and p1 is not the king
-                if board.fields[p1.0][p1.1] != WhiteKing && board.can_capture_with(p1, p2) {
+                if board[p1] != WhiteKing && board.can_capture_with(p1, p2) {
                     //Capture p1
-                    board.fields[p1.0][p1.1] = Empty;
+                    board[p1] = Empty;
                 }
             }
         });
@@ -31,7 +31,7 @@ fn test_capture() {
     assert_eq!(Ok(()), board.make_move((3, 0), (3, 4)));
     assert_eq!(Ok(()), board.make_move((7, 5), (7, 6)));
     assert_eq!(Ok(()), board.make_move((3, 10), (3, 6)));
-    assert_eq!(Empty, board.fields[3][5]);
+    assert_eq!(Empty, board[(3usize, 5usize)]);
 }
 
 #[test]
@@ -57,5 +57,5 @@ fn test_not_capture_king() {
     for mv in moves.iter() {
         assert_eq!(Ok(()), board.make_move(mv.0, mv.1));
     }
-    assert_eq!(WhiteKing, board.fields[5][4]);
+    assert_eq!(WhiteKing, board[(5usize, 4usize)]);
 }

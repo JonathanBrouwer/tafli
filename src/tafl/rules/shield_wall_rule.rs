@@ -8,8 +8,8 @@ pub struct ShieldWallRule;
 
 impl ShieldWallRule {
     fn check(&self, board: &mut BoardConfiguration, to: (usize, usize), start: (usize, usize)) {
-        if board.fields[start.0][start.1] == Empty { return; }
-        if board.fields[start.0][start.1].player().unwrap() == board.fields[to.0][to.1].player().unwrap() { return; }
+        if board[start] == Empty { return; }
+        if board[start].player().unwrap() == board[to].player().unwrap() { return; }
 
         //Find all pieces connected to the start, using a breath first search
         //Captured group will contain all of the walled off pieces
@@ -33,13 +33,13 @@ impl ShieldWallRule {
                     let nb = (nb.0 as usize, nb.1 as usize);
 
                     //Check type of piece
-                    match board.fields[nb.0][nb.1].player() {
+                    match board[nb].player() {
                         //Can we use this neighbour as part of the wall?
                         _ if board.can_capture_with(start, nb) => {}
                         //If neighbour is air, group is not walled
                         None => fail = true,
                         //If neighbour is of the same team, and not seen earlier, add it to the queue
-                        Some(player) if player == board.fields[start.0][start.1].player().unwrap() => {
+                        Some(player) if player == board[start].player().unwrap() => {
                             if !queue.contains(&nb) && !captured_group.contains(&nb) {
                                 queue.push_back(nb);
                             }
@@ -53,7 +53,7 @@ impl ShieldWallRule {
         //If we didnt fail, this is a valid shield capture. Capture all the pieces
         if !fail {
             for piece in captured_group {
-                board.fields[piece.0][piece.1] = Empty;
+                board[piece] = Empty;
             }
         }
     }

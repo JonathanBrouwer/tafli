@@ -6,6 +6,7 @@ use crate::tafl::board::Player::{Black, White};
 use crate::tafl::rules::capture_rule::CaptureRule;
 use crate::tafl::rules::shield_wall_rule::ShieldWallRule;
 use crate::tafl::rules::rule::Rule;
+use std::ops::{Index, IndexMut};
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
 pub struct BoardConfiguration {
@@ -49,8 +50,8 @@ impl BoardConfiguration {
     }
 
     pub fn can_capture_with(&self, to_capture: (usize, usize), capture_with: (usize, usize)) -> bool {
-        match (self.fields[to_capture.0][to_capture.1].player(),
-               self.fields[capture_with.0][capture_with.1].player(),
+        match (self[to_capture].player(),
+               self[capture_with].player(),
                Self::special_squares().contains(&capture_with)) {
             //Capture using friendly piece
             (Some(p1), Some(p2), _) if p1 != p2 => true,
@@ -64,7 +65,7 @@ impl BoardConfiguration {
     /// Returns a Vec of all legal moves for the piece in the given position
     pub fn legal_moves(&self, from: (usize, usize)) -> Vec<(usize, usize)> {
         //Empty tiles cannot move
-        if self.fields[from.0][from.1] == Empty { return Vec::new(); }
+        if self[from] == Empty { return Vec::new(); }
 
         //For each wind direction, iterate
         [(1, 0), (-1, 0), (0, 1), (0, -1)].iter().map(|dir| {
@@ -76,12 +77,12 @@ impl BoardConfiguration {
                 //Take while the squares are in the board
                 .take_while(|pos| { pos.0 >= 0 && pos.1 >= 0 && pos.0 < 11 && pos.1 < 11 })
                 //Take while the squares are empty
-                .take_while(|pos| { self.fields[pos.0 as usize][pos.1 as usize] == Empty })
+                .take_while(|pos| { self[*pos] == Empty })
                 //Map to (usize, usize)
                 .map(|pos| (pos.0 as usize, pos.1 as usize))
                 //If this is not the king, we are not allowed to move on the special squares
                 .take_while(|pos| {
-                    self.fields[from.0][from.1] == WhiteKing || !Self::special_squares().contains(pos)
+                    self[from] == WhiteKing || !Self::special_squares().contains(pos)
                 })
         }).flatten().collect()
     }
@@ -91,11 +92,11 @@ impl BoardConfiguration {
         //Check if move is legal
         if !self.legal_moves(from).contains(&to) { return Err(IllegalMove); }
         //Check if move is made by the right player
-        if self.fields[from.0][from.1].player().unwrap() != self.turn { return Err(WrongPlayer); }
+        if self[from].player().unwrap() != self.turn { return Err(WrongPlayer); }
 
         //Move piece
-        self.fields[to.0][to.1] = self.fields[from.0][from.1];
-        self.fields[from.0][from.1] = Empty;
+        self[to] = self[from];
+        self[from] = Empty;
 
         //Apply rules
         Self::rules().iter().for_each(|rule| {
@@ -106,6 +107,50 @@ impl BoardConfiguration {
         self.turn = self.turn.other();
 
         return Ok(());
+    }
+}
+
+impl Index<(usize, usize)> for BoardConfiguration {
+    type Output = FieldState;
+
+    fn index(&self, pos: (usize, usize)) -> &Self::Output {
+        if pos.0 < 11 && pos.1 < 11 {
+            &self.fields[pos.0][pos.1]
+        } else {
+            panic!("Invalid position");
+        }
+    }
+}
+
+impl Index<(isize, isize)> for BoardConfiguration {
+    type Output = FieldState;
+
+    fn index(&self, pos: (isize, isize)) -> &Self::Output {
+        if pos.0 >= 0 && pos.1 >= 0 && pos.0 < 11 && pos.1 < 11 {
+            &self.fields[pos.0 as usize][pos.1 as usize]
+        } else {
+            panic!("Invalid position");
+        }
+    }
+}
+
+impl IndexMut<(usize, usize)> for BoardConfiguration {
+    fn index_mut(&mut self, pos: (usize, usize)) -> &mut Self::Output {
+        if pos.0 < 11 && pos.1 < 11 {
+            &mut self.fields[pos.0][pos.1]
+        } else {
+            panic!("Invalid position");
+        }
+    }
+}
+
+impl IndexMut<(isize, isize)> for BoardConfiguration {
+    fn index_mut(&mut self, pos: (isize, isize)) -> &mut Self::Output {
+        if pos.0 >= 0 && pos.1 >= 0 && pos.0 < 11 && pos.1 < 11 {
+            &mut self.fields[pos.0 as usize][pos.1 as usize]
+        } else {
+            panic!("Invalid position");
+        }
     }
 }
 
