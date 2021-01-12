@@ -31,9 +31,16 @@ mod test {
     use crate::tafl::game::GameStatus::{Won, Playing};
 
     #[test]
-    fn test_king_escape() {
+    fn test_king_surround() {
         let mut game = Game::from_file(include_str!("../../assets/test_black_king_surround.txt"));
         assert_eq!(Ok(()), game.make_move((0, 2), (0,1)));
+        assert_eq!(game.status, Won(Black, String::from("King was surrounded")))
+    }
+
+    #[test]
+    fn test_king_with_middle() {
+        let mut game = Game::from_file(include_str!("../../assets/test_black_king_surround.txt"));
+        assert_eq!(Ok(()), game.make_move((5,8), (5,7)));
         assert_eq!(game.status, Won(Black, String::from("King was surrounded")))
     }
 
