@@ -2,15 +2,15 @@ use actix::prelude::*;
 use actix_web::{Error, HttpRequest, HttpResponse, web};
 use actix_web_actors::ws;
 
-use crate::api::board_broadcast_server::{Connect, Disconnect, ReceiveBoard};
+use crate::api::game_broadcast_server::{Connect, Disconnect, ReceiveGame};
 
-use crate::api::board_broadcast_server::board_broadcast;
+use crate::api::game_broadcast_server::board_broadcast;
 
-pub struct WsGetBoard {
+pub struct WsGetGame {
     id: usize
 }
 
-impl Actor for WsGetBoard {
+impl Actor for WsGetGame {
     type Context = ws::WebsocketContext<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
@@ -33,15 +33,15 @@ impl Actor for WsGetBoard {
     }
 }
 
-impl Handler<ReceiveBoard> for WsGetBoard {
+impl Handler<ReceiveGame> for WsGetGame {
     type Result = ();
 
-    fn handle(&mut self, msg: ReceiveBoard, ctx: &mut Self::Context) {
-        ctx.text(serde_json::to_string(&msg.board).unwrap());
+    fn handle(&mut self, msg: ReceiveGame, ctx: &mut Self::Context) {
+        ctx.text(serde_json::to_string(&msg.game).unwrap());
     }
 }
 
-impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsGetBoard {
+impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsGetGame {
     fn handle(
         &mut self,
         _msg: Result<ws::Message, ws::ProtocolError>,
@@ -50,8 +50,8 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsGetBoard {
     }
 }
 
-pub async fn get_board(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
-    ws::start(WsGetBoard {
+pub async fn get_game(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
+    ws::start(WsGetGame {
         id: 0
     }, &req, stream)
 }

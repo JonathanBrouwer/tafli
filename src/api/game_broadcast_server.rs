@@ -6,13 +6,14 @@ use rand::rngs::ThreadRng;
 use crate::state;
 
 use crate::tafl::board::BoardConfiguration;
+use crate::tafl::game::Game;
 
 lazy_static! {
     pub static ref board_broadcast: Addr<BoardBroadcast> = BoardBroadcast::new().start();
 }
 
 pub struct BoardBroadcast {
-    sessions: HashMap<usize, Recipient<ReceiveBoard>>,
+    sessions: HashMap<usize, Recipient<ReceiveGame>>,
     rng: ThreadRng,
 }
 
@@ -34,8 +35,8 @@ impl Handler<Connect> for BoardBroadcast {
 
     fn handle(&mut self, msg: Connect, _: &mut Context<Self>) -> Self::Result {
         // send initial state
-        let cur_board = *state::state.board.lock().unwrap();
-        let _ = msg.addr.do_send(ReceiveBoard { board: cur_board });
+        let cur_game = *state::state.game.lock().unwrap();
+        let _ = msg.addr.do_send(ReceiveGame { game: cur_game });
 
         // register session with random id
         let id = self.rng.gen::<usize>();
@@ -55,12 +56,12 @@ impl Handler<Disconnect> for BoardBroadcast {
     }
 }
 
-impl Handler<ReceiveBoard> for BoardBroadcast {
+impl Handler<ReceiveGame> for BoardBroadcast {
     type Result = ();
 
-    fn handle(&mut self, msg: ReceiveBoard, _ctx: &mut Context<Self>) {
+    fn handle(&mut self, msg: ReceiveGame, _ctx: &mut Context<Self>) {
         self.sessions.values().for_each(|ses| {
-            let _ = ses.do_send(ReceiveBoard { board: msg.board });
+            let _ = ses.do_send(ReceiveGame { game: msg.game });
         })
     }
 }
@@ -68,7 +69,7 @@ impl Handler<ReceiveBoard> for BoardBroadcast {
 #[derive(Message)]
 #[rtype(usize)]
 pub struct Connect {
-    pub addr: Recipient<ReceiveBoard>,
+    pub addr: Recipient<ReceiveGame>,
 }
 
 #[derive(Message)]
@@ -79,6 +80,6 @@ pub struct Disconnect {
 
 #[derive(Message)]
 #[rtype(result = "()")]
-pub struct ReceiveBoard {
-    pub board: BoardConfiguration
+pub struct ReceiveGame {
+    pub game: Game
 }

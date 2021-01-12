@@ -2,11 +2,12 @@
   <navbar></navbar>
   <div class="container-fluid">
     <div class="row">
-      <div class="col-12 col-lg">Left</div>
-      <div class="col-12 col-lg">
-        <board :state="boarddata"></board>
+      <div class="col-12 col-lg-7 order-lg-1 col-xl-5">
+        <board v-if="game !== null" :state="game.board"></board>
+        <span v-if="game === null">Loading...</span>
       </div>
-      <div class="col-12 col-lg">Right</div>
+      <div class="col-12 col-lg-5 order-lg-0 col-xl">Left</div>
+      <div class="col-12 col-lg-12 order-lg-2 col-xl"></div>
     </div>
   </div>
 </template>
@@ -15,33 +16,25 @@
 
 import Board from "@/components/Board";
 import Navbar from "@/components/Navbar";
-import {BoardConfiguration, FieldState, Player} from "./ts/board_configuration";
+import {Game} from "@/ts/game";
+import {deserialize, plainToClass} from "class-transformer";
+import {BoardConfiguration} from "@/ts/board_configuration";
 
 export default {
   name: 'App',
   components: {Board, Navbar},
   data() {
     return {
-      boarddata: new BoardConfiguration([
-        [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
-        [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
-        [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
-        [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
-        [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
-        [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
-        [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
-        [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
-        [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
-        [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty],
-        [FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty, FieldState.Empty]], Player.Black)
+      game: null
     }
   },
   mounted() {
-    let ws = new WebSocket("ws://localhost:8000/api/get_board");
+    let ws = new WebSocket("ws://localhost:8000/api/get_game");
     ws.onmessage = event => {
-      let board = Object.assign(new BoardConfiguration(null, null), JSON.parse(event.data));
-      this.boarddata = board;
-      console.log(board);
+      let game = deserialize(Game, event.data);
+      game.board = plainToClass(BoardConfiguration, game.board);
+
+      this.game = game;
     }
   }
 }

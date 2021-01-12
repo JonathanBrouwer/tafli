@@ -24,7 +24,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(Logger::default())
             .wrap(cors)
-            .route("/api/get_board", web::get().to(api::get_board::get_board))
+            .route("/api/get_game", web::get().to(api::get_game::get_game))
             .service(api::make_move::make_move)
             .service(api::legal_moves::legal_moves)
             .service(fs::Files::new("/", "./tafli/dist").show_files_listing().index_file("index.html"))

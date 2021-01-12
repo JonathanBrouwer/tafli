@@ -1,5 +1,5 @@
-pub mod get_board;
+pub mod get_game;
 pub mod make_move;
-pub mod board_broadcast_server;
+pub mod game_broadcast_server;
 pub mod legal_moves;
 

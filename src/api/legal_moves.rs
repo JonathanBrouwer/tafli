@@ -5,13 +5,12 @@ use crate::api::make_move::MakeMoveInput;
 
 #[get("/api/legal_moves")]
 pub async fn legal_moves(input: web::Query<LegalMovesInput>) -> web::Json<LegalMovesResponse> {
-    let board = state::state.board.lock().unwrap();
+    let game = state::state.game.lock().unwrap();
 
     let pos = input.pos();
     if pos.is_err() { return web::Json(LegalMovesResponse{ moves: Vec::new()}); }
 
-    let moves = board.legal_moves(pos.unwrap());
-    let moves = moves;
+    let moves = game.board.legal_moves(pos.unwrap());
     web::Json(LegalMovesResponse{ moves })
 }
 
