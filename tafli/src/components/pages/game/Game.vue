@@ -39,7 +39,7 @@ export default {
     }
   },
   mounted() {
-    let ws = new WebSocket("ws://86.83.105.238:8000/api/get_game");
+    let ws = new WebSocket("ws://localhost:8000/api/get_game");
     ws.onmessage = event => {
       let game = deserialize(Game, event.data);
       game.board = plainToClass(BoardConfiguration, game.board);

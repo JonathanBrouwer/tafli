@@ -1,15 +1,17 @@
 <template>
   <navbar></navbar>
-  <component v-bind:is="CurrentComponent"></component>
+  <Home v-if="currentRoute === '/'"></Home>
+  <Learn v-if="currentRoute === '/learn'"></Learn>
+  <Game v-if="currentRoute === '/game'"></Game>
 </template>
 
 <script>
 
+import Home from "@/components/pages/Home";
 import Navbar from "@/components/Navbar";
 import Game from "@/components/pages/game/Game";
 import Learn from "@/components/pages/Learn";
 import NotFound from "@/components/pages/NotFound";
-import * as Vue from "@vue/runtime-core";
 
 const routes = {
   '/': Game,
@@ -18,10 +20,11 @@ const routes = {
 
 export default {
   name: 'App',
-  components: {Navbar},
+  components: {Game, Learn, Navbar, Home},
   data() {
     return {
-      currentRoute: window.location.pathname
+      currentRoute: window.location.pathname,
+      game: null
     }
   },
   computed: {

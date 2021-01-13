@@ -8,13 +8,12 @@ extern crate serde;
 use actix_cors::Cors;
 use actix_files as fs;
 use actix_web::{App, HttpServer, middleware::Logger, web};
+use actix_session::CookieSession;
 
 mod tafl;
 mod api;
 pub mod state;
 mod prev_move_info;
-
-const ip: &str = "86.83.105.238";
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -27,12 +26,14 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(Logger::default())
             .wrap(cors)
+            .wrap(CookieSession::signed(&[0; 32]).secure(false))
             .route("/api/get_game", web::get().to(api::get_game::get_game))
+            .service(api::game_mgmt::create_game::create_game)
             .service(api::make_move::make_move)
             .service(api::legal_moves::legal_moves)
             .service(fs::Files::new("/", "./tafli/dist").show_files_listing().index_file("index.html"))
     })
-        .bind(("192.168.2.19", 8000))?
+        .bind(("localhost", 8000))?
         .run()
         .await
 }

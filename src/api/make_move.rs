@@ -1,11 +1,11 @@
-use actix_web::{get, web};
+use actix_web::{post, web};
 
 use crate::api::game_broadcast_server::ReceiveGame;
 use crate::api::game_broadcast_server;
 use crate::api::make_move::MakeMoveResponse::{ERROR, SUCCESS};
 use crate::state;
 
-#[get("/api/make_move")]
+#[post("/api/make_move")]
 pub async fn make_move(input: web::Query<MakeMoveInput>) -> web::Json<MakeMoveResponse> {
     let mut game = state::state.game.lock().unwrap();
 
