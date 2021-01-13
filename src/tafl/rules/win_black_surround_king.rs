@@ -1,8 +1,8 @@
-use crate::tafl::board::FieldState::{WhiteKing};
-use crate::tafl::game::Game;
-use crate::tafl::rules::rule::Rule;
-use crate::tafl::game::GameStatus::Won;
+use crate::tafl::board::FieldState::WhiteKing;
 use crate::tafl::board::Player::Black;
+use crate::tafl::game::Game;
+use crate::tafl::game::GameStatus::Won;
+use crate::tafl::rules::rule::Rule;
 
 pub struct WinBlackSurroundKing;
 
@@ -27,30 +27,30 @@ impl Rule for WinBlackSurroundKing {
 
 #[cfg(test)]
 mod test {
+    use crate::tafl::board::Player::{Black, White};
     use crate::tafl::game::Game;
-    use crate::tafl::board::Player::{White, Black};
-    use crate::tafl::game::GameStatus::{Won, Playing};
+    use crate::tafl::game::GameStatus::{Playing, Won};
 
     #[test]
     fn test_king_surround() {
         let mut game = Game::from_file(include_str!("../../assets/test_black_king_surround.txt"));
-        assert_eq!(Ok(()), game.make_move((0, 2), (0,1)));
+        assert_eq!(Ok(()), game.make_move((0, 2), (0, 1)));
         assert_eq!(game.status, Won(Black, String::from("King was surrounded")))
     }
 
     #[test]
     fn test_king_with_middle() {
         let mut game = Game::from_file(include_str!("../../assets/test_black_king_surround.txt"));
-        assert_eq!(Ok(()), game.make_move((5,8), (5,7)));
+        assert_eq!(Ok(()), game.make_move((5, 8), (5, 7)));
         assert_eq!(game.status, Won(Black, String::from("King was surrounded")))
     }
 
     #[test]
     fn test_king_safe_edge() {
         let mut game = Game::from_file(include_str!("../../assets/test_black_king_surround.txt"));
-        assert_eq!(Ok(()), game.make_move((1,0), (2,0)));
-        assert_eq!(Ok(()), game.make_move((1,1), (0,1)));
-        assert_eq!(Ok(()), game.make_move((2,1), (1,1)));
+        assert_eq!(Ok(()), game.make_move((1, 0), (2, 0)));
+        assert_eq!(Ok(()), game.make_move((1, 1), (0, 1)));
+        assert_eq!(Ok(()), game.make_move((2, 1), (1, 1)));
         assert_eq!(game.status, Playing)
     }
 }

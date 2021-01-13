@@ -2,14 +2,14 @@
   <div class="mb-3 meta-view-line">
     <div class="meta-view-box">
       <h3>Hnefatafl (Copenhagen)</h3>
-      <h5>15+15 • Casual • Classical</h5>
+      <h5>{{ game.time_control[0] }} + {{ game.time_control[1] }} • Casual</h5>
       <div class="player-indicator-name">
         <div class="board-piece board-piece-white player-indicator-icon"></div>
-        <span>Player Name (Rating)</span>
+        <span>{{ game.player_white.name }}</span>
       </div>
       <div class="player-indicator-name">
         <div class="board-piece board-piece-black player-indicator-icon"></div>
-        <span>Player Name (Rating)</span>
+        <span>{{ game.player_black.name }}</span>
       </div>
       <hr>
       <div class="meta-victory">
@@ -29,7 +29,7 @@
            class="col meta-view-box">
         <div class="player-indicator-name justify-content-center">
           <div class="board-piece board-piece-white player-indicator-icon"></div>
-          <span>Player Name</span>
+          <span>{{ game.player_white.name }}</span>
         </div>
         <div class="player-indicator-time">
           00:00
@@ -39,7 +39,7 @@
            class="col meta-view-box text-center">
         <div class="player-indicator-name justify-content-center">
           <div class="board-piece board-piece-black player-indicator-icon"></div>
-          <span>Player Name</span>
+          <span>{{ game.player_black.name }}</span>
         </div>
         <div class="player-indicator-time">
           00:00

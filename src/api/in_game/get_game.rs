@@ -7,7 +7,7 @@ use crate::api::in_game::game_broadcast_server::board_broadcast;
 
 pub struct WsGetGame {
     address: usize,
-    gameid: usize
+    gameid: usize,
 }
 
 impl Actor for WsGetGame {
@@ -52,7 +52,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsGetGame {
 pub async fn get_game(req: HttpRequest, stream: web::Payload, input: web::Query<GetGameParams>) -> Result<HttpResponse, Error> {
     ws::start(WsGetGame {
         address: 0,
-        gameid: input.id
+        gameid: input.id,
     }, &req, stream)
 }
 

@@ -49,7 +49,7 @@ impl Handler<Connect> for BoardBroadcast {
         let games = GAMESTATE.full_games.lock().unwrap();
         if games.contains_key(&msg.gameid) {
             let _ = msg.addr.do_send(ReceiveGame { game: games.get(&msg.gameid).unwrap().clone() });
-        }else {
+        } else {
             //TODO
         }
 
@@ -83,7 +83,7 @@ impl Handler<ReceiveGame> for BoardBroadcast {
 #[rtype(usize)]
 pub struct Connect {
     pub addr: Recipient<ReceiveGame>,
-    pub gameid: usize
+    pub gameid: usize,
 }
 
 #[derive(Message)]

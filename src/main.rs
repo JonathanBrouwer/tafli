@@ -7,12 +7,11 @@ extern crate serde;
 
 use actix_cors::Cors;
 use actix_files as fs;
-use actix_web::{App, HttpServer, middleware::Logger, web};
 use actix_session::CookieSession;
+use actix_web::{App, HttpServer, middleware::Logger, web};
 
 mod tafl;
 mod api;
-mod prev_move_info;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -27,6 +26,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(cors)
             .wrap(CookieSession::signed(&[0; 32]).secure(false))
             .route("/api/get_game", web::get().to(api::in_game::get_game::get_game))
+            .service(api::game_mgmt::list_partial_games::list_partial_games)
             .service(api::game_mgmt::create_game::create_game)
             .service(api::in_game::make_move::make_move)
             .service(api::in_game::legal_moves::legal_moves)

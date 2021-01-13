@@ -173,12 +173,15 @@ export default {
 .board-tile.selected {
   background: rgba(40, 167, 69, .6) !important;
 }
+
 .board-tile.prev-move {
   background: rgb(255, 246, 186) !important;
 }
+
 .board-tile.captured {
   background: rgb(248, 189, 189) !important;
 }
+
 .board-tile.legal-move {
   background: rgba(40, 167, 69, .2) !important;
 }

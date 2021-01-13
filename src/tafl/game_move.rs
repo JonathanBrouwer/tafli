@@ -5,8 +5,8 @@ use crate::tafl::game_move::MakeMoveError::{IllegalMove, WrongPlayer};
 use crate::tafl::rules::capture_rule::CaptureRule;
 use crate::tafl::rules::rule::Rule;
 use crate::tafl::rules::shield_wall_rule::ShieldWallRule;
-use crate::tafl::rules::win_white_corner::WinWhiteCorner;
 use crate::tafl::rules::win_black_surround_king::WinBlackSurroundKing;
+use crate::tafl::rules::win_white_corner::WinWhiteCorner;
 
 impl Game {
     pub fn rules() -> Vec<Box<dyn Rule>> {
@@ -14,7 +14,7 @@ impl Game {
             Box::new(CaptureRule {}),
             Box::new(ShieldWallRule {}),
             Box::new(WinWhiteCorner {}),
-            Box::new(WinBlackSurroundKing{})
+            Box::new(WinBlackSurroundKing {})
         ]
     }
 

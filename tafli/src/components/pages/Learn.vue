@@ -7,14 +7,11 @@
 <script>
 export default {
   name: 'learn',
-  props: {
-  },
+  props: {},
   data() {
-    return {
-    }
+    return {}
   },
-  methods: {
-  }
+  methods: {}
 }
 </script>
 

@@ -1,5 +1,5 @@
 use actix_session::Session;
-use rand::{thread_rng, Rng};
+use rand::{Rng, thread_rng};
 
 pub trait UserIdSession {
     fn get_user_id(&self) -> usize;

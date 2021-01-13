@@ -1,11 +1,11 @@
 <template>
-  <div class="container-fluid" id="game">
+  <div id="game" class="container-fluid">
     <div class="row justify-content-center">
       <div class="col-12 col-lg-5 col-xl-3">
-        <meta-view :game="game"></meta-view>
+        <meta-view v-if="game !== null" :game="game"></meta-view>
       </div>
       <div class="col-12 col-lg-7 col-xl-5">
-        <board ref="boardComp" v-if="game !== null" :game="game"></board>
+        <board v-if="game !== null" ref="boardComp" :game="game"></board>
         <span v-if="game === null">Loading...</span>
       </div>
     </div>

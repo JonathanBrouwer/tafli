@@ -1,4 +1,4 @@
-use crate::tafl::board::FieldState::{WhiteKing};
+use crate::tafl::board::FieldState::WhiteKing;
 use crate::tafl::game::Game;
 use crate::tafl::rules::rule::Rule;
 
@@ -30,7 +30,7 @@ impl Rule for CaptureRule {
 
 #[cfg(test)]
 mod test {
-    use crate::tafl::board::FieldState::{Empty, WhitePiece, WhiteKing};
+    use crate::tafl::board::FieldState::{Empty, WhiteKing, WhitePiece};
     use crate::tafl::game::Game;
 
     #[test]

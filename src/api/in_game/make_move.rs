@@ -1,9 +1,9 @@
 use actix_web::{post, web};
 
-use crate::api::in_game::game_broadcast_server::ReceiveGame;
-use crate::api::in_game::game_broadcast_server;
-use crate::api::in_game::make_move::MakeMoveResponse::{ERROR, SUCCESS};
 use crate::api::game_mgmt::game_mgmt::GAMESTATE;
+use crate::api::in_game::game_broadcast_server;
+use crate::api::in_game::game_broadcast_server::ReceiveGame;
+use crate::api::in_game::make_move::MakeMoveResponse::{ERROR, SUCCESS};
 
 #[post("/api/make_move")]
 pub async fn make_move(input: web::Query<MakeMoveInput>) -> web::Json<MakeMoveResponse> {
