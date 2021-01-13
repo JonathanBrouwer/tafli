@@ -39,11 +39,14 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="pgame in part_games" :key="pgame">
+            <tr v-for="pgame in part_games" :key="pgame" style="cursor: pointer;" v-on:click="join_game(pgame.game_id)">
               <td>{{pgame.player.name}}</td>
               <td>Copenhagen</td>
               <td>{{pgame.time_start}} + {{pgame.time_incr}}</td>
               <td>{{ Math.round((Date.now() / 1000 - pgame.created_at)/60)}} minutes ago</td>
+            </tr>
+            <tr v-if="part_games.length === 0">
+              <td colspan="4">There are currently no games waiting for players</td>
             </tr>
             </tbody>
           </table>
@@ -76,12 +79,28 @@ export default {
         time_start: t1,
         time_incr: t2
       });
-      fetch(url.toString(), {method: 'POST'})
+      fetch(url.toString(), {method: 'POST', credentials: "include"})
           .then(res => res.json())
           .then(game_id => {
             window.location.href = "/game/" + game_id;
           });
 
+    },
+    join_game(id) {
+      let url = new URL("http://localhost:8000/api/join_game");
+      url.search = new URLSearchParams({
+        player_name: "Name second",
+        gameid: id
+      });
+      fetch(url.toString(), {method: 'POST', credentials: "include"})
+          .then(res => res.json())
+          .then(res => {
+            if(res) {
+              window.location.href = "/game/" + id;
+            }else {
+              window.alert("Failed to join game.")
+            }
+          });
     }
   },
   mounted() {
