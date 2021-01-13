@@ -1,12 +1,27 @@
 <template>
   <div id="game" class="container-fluid">
-    <div class="row justify-content-center">
+    <div v-if="game !== null" class="row justify-content-center">
       <div class="col-12 col-lg-5 col-xl-3">
-        <meta-view v-if="game !== null" :game="game"></meta-view>
+        <meta-view :game="game"></meta-view>
       </div>
       <div class="col-12 col-lg-7 col-xl-5">
-        <board v-if="game !== null" ref="boardComp" :game="game"></board>
-        <span v-if="game === null">Loading...</span>
+        <board ref="boardComp" :game="game"></board>
+      </div>
+    </div>
+    <div v-if="game === null && !connected" class="row justify-content-center">
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card p-3 mb-2">
+          Connecting to game server...
+          <a class="btn btn-block btn-outline-dark mt-3" href="/">Cancel</a>
+        </div>
+      </div>
+    </div>
+    <div v-if="game === null && connected" class="row justify-content-center">
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card p-3 mb-2">
+          Searching for game...
+          <a class="btn btn-block btn-outline-dark mt-3" href="/">Cancel</a>
+        </div>
       </div>
     </div>
   </div>
@@ -30,6 +45,7 @@ export default {
   },
   data() {
     return {
+      connected: false,
       game: null
     }
   },
@@ -43,11 +59,17 @@ export default {
   },
   mounted() {
     let ws = new WebSocket("ws://localhost:8000/api/get_game?id=" + this.gameid);
+    ws.onopen = event => {
+      this.connected = true;
+    }
     ws.onmessage = event => {
       let game = deserialize(Game, event.data);
       game.board = plainToClass(BoardConfiguration, game.board);
       this.clear_focus();
       this.game = game;
+    }
+    ws.onclose = event => {
+      this.connected = false;
     }
   }
 }

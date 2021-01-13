@@ -17,8 +17,7 @@ pub async fn create_game(input: web::Query<CreateGameInput>, session: Session) -
     let game_id = rng.gen_range(0, 2usize.pow(50));
     let game = PartialGame {
         game_id,
-        player_id: user_id,
-        player_name: input.player_name.clone(),
+        player: PlayerInfo{ userid: user_id, name: input.player_name.clone()},
         time_start: input.time_start,
         time_incr: input.time_incr,
         created_at: SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() as usize,
@@ -26,12 +25,6 @@ pub async fn create_game(input: web::Query<CreateGameInput>, session: Session) -
 
     let mut games = GAMESTATE.part_games.lock().unwrap();
     games.insert(game_id, game);
-
-    let mut test = GAMESTATE.full_games.lock().unwrap();
-    test.insert(game_id, Game::new(
-        game_id,
-        PlayerInfo { userid: 0, name: String::from("white") },
-        PlayerInfo { userid: 0, name: String::from("black") }, (input.time_start, input.time_incr)));
 
     web::Json(game_id)
 }

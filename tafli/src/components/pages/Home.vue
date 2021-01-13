@@ -40,10 +40,10 @@
             </thead>
             <tbody>
             <tr v-for="pgame in part_games" :key="pgame">
-              <td>{{pgame.player_name}}</td>
+              <td>{{pgame.player.name}}</td>
               <td>Copenhagen</td>
               <td>{{pgame.time_start}} + {{pgame.time_incr}}</td>
-              <td>10 seconds ago</td>
+              <td>{{ Math.round((Date.now() / 1000 - pgame.created_at)/60)}} minutes ago</td>
             </tr>
             </tbody>
           </table>
