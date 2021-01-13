@@ -1,4 +1,4 @@
-use crate::tafl::board::FieldState::{WhiteKing, BlackPiece};
+use crate::tafl::board::FieldState::{WhiteKing};
 use crate::tafl::game::Game;
 use crate::tafl::rules::rule::Rule;
 use crate::tafl::game::GameStatus::Won;

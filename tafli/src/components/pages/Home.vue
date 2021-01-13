@@ -9,34 +9,10 @@
       <div class="col-12 col-lg-6 px-3">
         <h3 class="mx-1">Create game</h3>
         <div class="row g-0">
-          <div class="col-4 px-1 mb-2">
+          <div class="col-4 px-1 mb-2" v-for="time in time_modes" :key="time">
             <div class="card py-3 mb-2 text-center time-card">
-              <h1>2 + 1</h1>
-              <h4>Bullet</h4>
-            </div>
-          </div>
-          <div class="col-4 px-1 mb-2">
-            <div class="card py-3 mb-2 text-center time-card">
-              <h1>3 + 2</h1>
-              <h4>Blitz</h4>
-            </div>
-          </div>
-          <div class="col-4 px-1 mb-2">
-            <div class="card py-3 mb-2 text-center time-card">
-              <h1>5 + 3</h1>
-              <h4>Blitz</h4>
-            </div>
-          </div>
-          <div class="col-4 px-1 mb-2">
-            <div class="card py-3 mb-2 text-center time-card">
-              <h1>10 + 5</h1>
-              <h4>Rapid</h4>
-            </div>
-          </div>
-          <div class="col-4 px-1 mb-2">
-            <div class="card py-3 mb-2 text-center time-card">
-              <h1>15 + 15</h1>
-              <h4>Classical</h4>
+              <h1>{{ time[0] }} + {{ time[1] }}</h1>
+              <h4>{{ time[2] }}</h4>
             </div>
           </div>
           <div class="col-4 px-1 mb-2">
@@ -89,12 +65,11 @@ export default {
   name: 'home',
   props: {},
   data() {
-    return {}
+    return {
+      time_modes: [[2, 1, "Bullet"], [3, 2, "Blitz"], [5, 3, "Blitz"], [10, 5, "Rapid"], [15, 15, "Classical"]]
+    }
   },
-  methods: {},
-  mounted() {
-    fetch("http://localhost:8000/api/create_game", {method: 'POST', credentials: "include"});
-  }
+  methods: {}
 }
 </script>
 

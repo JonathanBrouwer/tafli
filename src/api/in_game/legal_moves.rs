@@ -1,6 +1,6 @@
 use actix_web::{get, web};
 
-use crate::api::make_move::MakeMoveInput;
+use crate::api::in_game::make_move::MakeMoveInput;
 use crate::state;
 
 #[get("/api/legal_moves")]

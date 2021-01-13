@@ -27,10 +27,10 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .wrap(cors)
             .wrap(CookieSession::signed(&[0; 32]).secure(false))
-            .route("/api/get_game", web::get().to(api::get_game::get_game))
+            .route("/api/get_game", web::get().to(api::in_game::get_game::get_game))
             .service(api::game_mgmt::create_game::create_game)
-            .service(api::make_move::make_move)
-            .service(api::legal_moves::legal_moves)
+            .service(api::in_game::make_move::make_move)
+            .service(api::in_game::legal_moves::legal_moves)
             .service(fs::Files::new("/", "./tafli/dist").show_files_listing().index_file("index.html"))
     })
         .bind(("localhost", 8000))?

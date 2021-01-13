@@ -1,8 +1,8 @@
 use actix_web::{post, web};
 
-use crate::api::game_broadcast_server::ReceiveGame;
-use crate::api::game_broadcast_server;
-use crate::api::make_move::MakeMoveResponse::{ERROR, SUCCESS};
+use crate::api::in_game::game_broadcast_server::ReceiveGame;
+use crate::api::in_game::game_broadcast_server;
+use crate::api::in_game::make_move::MakeMoveResponse::{ERROR, SUCCESS};
 use crate::state;
 
 #[post("/api/make_move")]

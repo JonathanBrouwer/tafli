@@ -2,8 +2,8 @@ use actix::prelude::*;
 use actix_web::{Error, HttpRequest, HttpResponse, web};
 use actix_web_actors::ws;
 
-use crate::api::game_broadcast_server::{Connect, Disconnect, ReceiveGame};
-use crate::api::game_broadcast_server::board_broadcast;
+use crate::api::in_game::game_broadcast_server::{Connect, Disconnect, ReceiveGame};
+use crate::api::in_game::game_broadcast_server::board_broadcast;
 
 pub struct WsGetGame {
     id: usize
