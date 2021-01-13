@@ -6,7 +6,8 @@ use crate::api::in_game::game_broadcast_server::{Connect, Disconnect, ReceiveGam
 use crate::api::in_game::game_broadcast_server::board_broadcast;
 
 pub struct WsGetGame {
-    id: usize
+    address: usize,
+    gameid: usize
 }
 
 impl Actor for WsGetGame {
@@ -14,11 +15,11 @@ impl Actor for WsGetGame {
 
     fn started(&mut self, ctx: &mut Self::Context) {
         board_broadcast
-            .send(Connect { addr: ctx.address().recipient() })
+            .send(Connect { addr: ctx.address().recipient(), gameid: self.gameid })
             .into_actor(self)
             .then(|res, act, ctx| {
                 match res {
-                    Ok(res) => act.id = res,
+                    Ok(res) => act.address = res,
                     _ => ctx.stop()
                 }
                 fut::ready(())
@@ -27,7 +28,7 @@ impl Actor for WsGetGame {
 
     fn stopping(&mut self, _ctx: &mut Self::Context) -> Running {
         board_broadcast
-            .do_send(Disconnect { id: self.id });
+            .do_send(Disconnect { id: self.address });
         Running::Stop
     }
 }
@@ -48,8 +49,14 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsGetGame {
     ) {}
 }
 
-pub async fn get_game(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
+pub async fn get_game(req: HttpRequest, stream: web::Payload, input: web::Query<GetGameParams>) -> Result<HttpResponse, Error> {
     ws::start(WsGetGame {
-        id: 0
+        address: 0,
+        gameid: input.id
     }, &req, stream)
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
+pub struct GetGameParams {
+    id: usize
 }

@@ -11,7 +11,7 @@ impl UserIdSession for Session {
             id
         } else {
             let mut rng = thread_rng();
-            let id = rng.gen();
+            let id = rng.gen_range(0, 2usize.pow(50));
             self.set("id", id).unwrap();
             id
         }

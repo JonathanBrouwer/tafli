@@ -12,7 +12,6 @@ use actix_session::CookieSession;
 
 mod tafl;
 mod api;
-pub mod state;
 mod prev_move_info;
 
 #[actix_web::main]

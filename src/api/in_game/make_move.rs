@@ -3,11 +3,12 @@ use actix_web::{post, web};
 use crate::api::in_game::game_broadcast_server::ReceiveGame;
 use crate::api::in_game::game_broadcast_server;
 use crate::api::in_game::make_move::MakeMoveResponse::{ERROR, SUCCESS};
-use crate::state;
+use crate::api::game_mgmt::game_mgmt::GAMESTATE;
 
 #[post("/api/make_move")]
 pub async fn make_move(input: web::Query<MakeMoveInput>) -> web::Json<MakeMoveResponse> {
-    let mut game = state::state.game.lock().unwrap();
+    let mut games = GAMESTATE.full_games.lock().unwrap();
+    let game = games.get_mut(&input.gameid).unwrap();
 
     let from = input.from();
     if from.is_err() { return web::Json(ERROR); }
@@ -22,6 +23,7 @@ pub async fn make_move(input: web::Query<MakeMoveInput>) -> web::Json<MakeMoveRe
 
 #[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
 pub struct MakeMoveInput {
+    gameid: usize,
     from: String,
     to: String,
 }

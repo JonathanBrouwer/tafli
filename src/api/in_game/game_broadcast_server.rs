@@ -4,7 +4,7 @@ use actix::prelude::*;
 use rand::Rng;
 use rand::rngs::ThreadRng;
 
-use crate::state;
+use crate::api::game_mgmt::game_mgmt::GAMESTATE;
 use crate::tafl::game::Game;
 
 lazy_static! {
@@ -13,6 +13,7 @@ lazy_static! {
 
 pub struct BoardBroadcast {
     sessions: HashMap<usize, Recipient<ReceiveGame>>,
+    game_sessions: HashMap<usize, Vec<usize>>,
     rng: ThreadRng,
 }
 
@@ -20,6 +21,7 @@ impl BoardBroadcast {
     pub fn new() -> Self {
         BoardBroadcast {
             sessions: HashMap::new(),
+            game_sessions: HashMap::new(),
             rng: rand::thread_rng(),
         }
     }
@@ -33,13 +35,23 @@ impl Handler<Connect> for BoardBroadcast {
     type Result = usize;
 
     fn handle(&mut self, msg: Connect, _: &mut Context<Self>) -> Self::Result {
-        // send initial state
-        let cur_game = state::state.game.lock().unwrap();
-        let _ = msg.addr.do_send(ReceiveGame { game: cur_game.clone() });
-
         // register session with random id
         let id = self.rng.gen::<usize>();
-        self.sessions.insert(id, msg.addr);
+        self.sessions.insert(id, msg.addr.clone());
+
+        // save the game this session is watching
+        if !self.game_sessions.contains_key(&msg.gameid) {
+            self.game_sessions.insert(msg.gameid, Vec::new());
+        }
+        self.game_sessions.get_mut(&msg.gameid).unwrap().push(id);
+
+        // send initial state
+        let games = GAMESTATE.full_games.lock().unwrap();
+        if games.contains_key(&msg.gameid) {
+            let _ = msg.addr.do_send(ReceiveGame { game: games.get(&msg.gameid).unwrap().clone() });
+        }else {
+            //TODO
+        }
 
         // send id back
         id
@@ -60,7 +72,9 @@ impl Handler<ReceiveGame> for BoardBroadcast {
 
     fn handle(&mut self, msg: ReceiveGame, _ctx: &mut Context<Self>) {
         self.sessions.values().for_each(|ses| {
-            let _ = ses.do_send(ReceiveGame { game: msg.game.clone() });
+            let _ = ses.do_send(ReceiveGame {
+                game: msg.game.clone()
+            });
         })
     }
 }
@@ -69,6 +83,7 @@ impl Handler<ReceiveGame> for BoardBroadcast {
 #[rtype(usize)]
 pub struct Connect {
     pub addr: Recipient<ReceiveGame>,
+    pub gameid: usize
 }
 
 #[derive(Message)]

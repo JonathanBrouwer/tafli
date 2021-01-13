@@ -25,6 +25,9 @@ export default {
     Board,
     MetaView
   },
+  props: {
+    gameid: Number
+  },
   data() {
     return {
       game: null
@@ -39,7 +42,7 @@ export default {
     }
   },
   mounted() {
-    let ws = new WebSocket("ws://localhost:8000/api/get_game");
+    let ws = new WebSocket("ws://localhost:8000/api/get_game?id=" + this.gameid);
     ws.onmessage = event => {
       let game = deserialize(Game, event.data);
       game.board = plainToClass(BoardConfiguration, game.board);

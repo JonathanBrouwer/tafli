@@ -1,8 +1,8 @@
 <template>
   <navbar></navbar>
-  <Home v-if="currentRoute === '/'"></Home>
-  <Learn v-if="currentRoute === '/learn'"></Learn>
-  <Game v-if="currentRoute === '/game'"></Game>
+  <Home v-if="route === '/'"></Home>
+  <Learn v-if="route === '/learn'"></Learn>
+  <Game v-if="route.startsWith('/game')" :gameid="parseInt(route.split('/')[2])"></Game>
 </template>
 
 <script>
@@ -23,13 +23,12 @@ export default {
   components: {Game, Learn, Navbar, Home},
   data() {
     return {
-      currentRoute: window.location.pathname,
-      game: null
+      route: window.location.pathname,
     }
   },
   computed: {
     CurrentComponent() {
-      return routes[this.currentRoute] || NotFound
+      return routes[this.route] || NotFound
     }
   }
 }
