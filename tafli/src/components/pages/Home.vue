@@ -104,7 +104,7 @@ export default {
     }
   },
   mounted() {
-    fetch("http://localhost:8000/api/list_partial_games")
+    fetch("http://localhost:8000/api/list_partial_games", {credentials: "include"})
         .then(res => res.json())
         .then(data => {
           this.part_games = data;

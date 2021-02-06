@@ -33,6 +33,7 @@ async fn main() -> std::io::Result<()> {
             .service(api::game_mgmt::create_game::create_game)
             .service(api::in_game::make_move::make_move)
             .service(api::in_game::legal_moves::legal_moves)
+            .service(api::user_mgmt::session_mgmt::identify)
             .service(fs::Files::new("/", "./tafli/dist").show_files_listing().index_file("index.html"))
             .default_service(web::get().to(index))
     })

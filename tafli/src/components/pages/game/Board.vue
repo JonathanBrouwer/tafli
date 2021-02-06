@@ -18,29 +18,30 @@
       <div v-for="x in 11" :key="x" class="col count col-count">{{ String.fromCharCode(65 + x - 1) }}</div>
       <div class="col count row-count"></div>
     </div>
-
   </div>
 </template>
 
 <script>
-import {FieldState, player} from "@/ts/board_configuration";
+import {BoardSide, FieldState, player} from "@/ts/board_configuration";
 import {Game} from "@/ts/game";
 
 export default {
   name: 'board',
   props: {
     game: Game,
+    side: BoardSide
   },
   data() {
     return {
       FieldState: FieldState,
+      BoardSide: BoardSide,
       active_square: null,
       legal_moves: []
     }
   },
   methods: {
     click_square(x, y) {
-      if (this.game.status !== 'Playing') {
+      if (this.game.status !== 'Playing' || this.side !== this.game.board.turn) {
         this.active_square = null;
         this.legal_moves = [];
         return;
@@ -71,7 +72,7 @@ export default {
         //Else, make a move
         let from = this.active_square;
         let to = [x, y];
-        fetch("http://localhost:8000/api/make_move?gameid=" + this.game.gameid + "&from=" + from[0] + "," + from[1] + "&to=" + to[0] + "," + to[1], {method: 'POST'});
+        fetch("http://localhost:8000/api/make_move?gameid=" + this.game.gameid + "&from=" + from[0] + "," + from[1] + "&to=" + to[0] + "," + to[1], {method: 'POST', credentials: "include"});
         this.active_square = null;
         this.legal_moves = [];
       }
@@ -79,7 +80,7 @@ export default {
     select_square(x, y) {
       this.active_square = [x, y];
       this.legal_moves = [];
-      fetch("http://localhost:8000/api/legal_moves?gameid=" + this.game.gameid + "&pos=" + this.active_square[0] + "," + this.active_square[1])
+      fetch("http://localhost:8000/api/legal_moves?gameid=" + this.game.gameid + "&pos=" + this.active_square[0] + "," + this.active_square[1], {credentials: "include"})
           .then(res => res.json())
           .then(data => {
             this.legal_moves = data.moves;
@@ -94,7 +95,7 @@ export default {
                 (this.game.prev_move_info.last_move[1][0] === x && this.game.prev_move_info.last_move[1][1] === y)),
         'captured': this.game !== null && this.game.prev_move_info.captures.filter(p => p[0] === x && p[1] === y).length > 0
       }
-    }
+    },
   }
 }
 </script>

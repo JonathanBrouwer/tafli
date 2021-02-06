@@ -35,6 +35,13 @@ impl Game {
             time_control: (10, 10),
         }
     }
+
+    pub fn player_info(&self, player: Player) -> &PlayerInfo {
+        match player {
+            Player::White => &self.player_white,
+            Player::Black => &self.player_black
+        }
+    }
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]

@@ -2,10 +2,10 @@
   <div id="game" class="container-fluid">
     <div v-if="game !== null" class="row justify-content-center">
       <div class="col-12 col-lg-5 col-xl-3">
-        <meta-view :game="game"></meta-view>
+        <meta-view :game="game" :side="side"></meta-view>
       </div>
       <div class="col-12 col-lg-7 col-xl-5">
-        <board ref="boardComp" :game="game"></board>
+        <board ref="boardComp" :game="game" :side="side"></board>
       </div>
     </div>
     <div v-if="game === null && !connected" class="row justify-content-center">
@@ -32,7 +32,7 @@ import Board from "@/components/pages/game/Board";
 import MetaView from "@/components/pages/game/MetaView";
 import {deserialize, plainToClass} from "class-transformer";
 import {Game} from "@/ts/game";
-import {BoardConfiguration} from "@/ts/board_configuration";
+import {BoardConfiguration, BoardSide} from "@/ts/board_configuration";
 
 export default {
   name: 'game',
@@ -46,7 +46,9 @@ export default {
   data() {
     return {
       connected: false,
-      game: null
+      game: null,
+      side: BoardSide.Spectator,
+      BoardSide: BoardSide
     }
   },
   methods: {
@@ -70,6 +72,25 @@ export default {
     }
     ws.onclose = event => {
       this.connected = false;
+    }
+  },
+  watch: {
+    game(game, _) {
+      if (game === null) {
+        this.side = BoardSide.Spectator;
+        return;
+      }
+      fetch("http://localhost:8000/api/identify", {credentials: "include"})
+          .then(res => res.json())
+          .then(data => {
+            console.log("Watch " + game.player_black.userid + " " + data);
+            if (game.player_white.userid === data) {
+              this.side = BoardSide.White;
+            }
+            if (game.player_black.userid === data) {
+              this.side = BoardSide.Black;
+            }
+          });
     }
   }
 }

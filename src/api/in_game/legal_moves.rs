@@ -6,7 +6,9 @@ use crate::api::in_game::make_move::MakeMoveInput;
 #[get("/api/legal_moves")]
 pub async fn legal_moves(input: web::Query<LegalMovesInput>) -> web::Json<LegalMovesResponse> {
     let mut games = GAMESTATE.full_games.lock().unwrap();
-    let game = games.get_mut(&input.gameid).unwrap();
+    let game = games.get_mut(&input.gameid);
+    if game.is_none() { return web::Json(LegalMovesResponse { moves: Vec::new() }); }
+    let game = game.unwrap();
 
     let pos = input.pos();
     if pos.is_err() { return web::Json(LegalMovesResponse { moves: Vec::new() }); }

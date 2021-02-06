@@ -28,3 +28,7 @@ export function player(state: FieldState) {
 export enum Player {
     White = "White", Black = "Black"
 }
+
+export enum BoardSide {
+    White = "White", Black = "Black", Spectator = "Spectator"
+}
