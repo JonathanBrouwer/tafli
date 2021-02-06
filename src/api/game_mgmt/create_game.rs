@@ -7,7 +7,7 @@ use rand::{Rng, thread_rng};
 use crate::api::game_mgmt::game_mgmt::GAMESTATE;
 use crate::api::game_mgmt::partial_game::PartialGame;
 use crate::api::user_mgmt::session_mgmt::UserIdSession;
-use crate::tafl::game::{Game, PlayerInfo};
+use crate::tafl::game::PlayerInfo;
 
 #[post("/api/create_game")]
 pub async fn create_game(mut input: web::Query<CreateGameInput>, session: Session) -> web::Json<usize> {
@@ -18,7 +18,7 @@ pub async fn create_game(mut input: web::Query<CreateGameInput>, session: Sessio
     let game_id = rng.gen_range(0, 2usize.pow(50));
     let game = PartialGame {
         game_id,
-        player: PlayerInfo{ userid: user_id, name: input.player_name.clone()},
+        player: PlayerInfo { userid: user_id, name: input.player_name.clone() },
         time_start: input.time_start,
         time_incr: input.time_incr,
         created_at: SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() as usize,

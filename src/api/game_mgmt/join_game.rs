@@ -1,14 +1,11 @@
-use std::time::SystemTime;
-
 use actix_session::Session;
 use actix_web::{post, web};
 use rand::{Rng, thread_rng};
 
 use crate::api::game_mgmt::game_mgmt::GAMESTATE;
-use crate::api::game_mgmt::partial_game::PartialGame;
+use crate::api::in_game::game_broadcast_server::{board_broadcast, ReceiveGame};
 use crate::api::user_mgmt::session_mgmt::UserIdSession;
 use crate::tafl::game::{Game, PlayerInfo};
-use crate::api::in_game::game_broadcast_server::{board_broadcast, ReceiveGame};
 
 #[post("/api/join_game")]
 pub async fn join_game(mut input: web::Query<JoinGameInput>, session: Session) -> web::Json<bool> {
@@ -29,10 +26,10 @@ pub async fn join_game(mut input: web::Query<JoinGameInput>, session: Session) -
 
     //Generate colors
     let mut rng = thread_rng();
-    let (mut wp, mut bp) = if rng.gen_bool(0.5) {
-        (PlayerInfo {userid, name: input.player_name.clone()}, pgame.player.clone())
+    let (wp, bp) = if rng.gen_bool(0.5) {
+        (PlayerInfo { userid, name: input.player_name.clone() }, pgame.player.clone())
     } else {
-        (pgame.player.clone(), PlayerInfo {userid, name: input.player_name.clone()})
+        (pgame.player.clone(), PlayerInfo { userid, name: input.player_name.clone() })
     };
 
     //Start game
@@ -41,11 +38,11 @@ pub async fn join_game(mut input: web::Query<JoinGameInput>, session: Session) -
         pgame.game_id,
         wp,
         bp,
-        (pgame.time_start, pgame.time_incr)
+        (pgame.time_start, pgame.time_incr),
     );
     let mut games = GAMESTATE.full_games.lock().unwrap();
     games.insert(game.gameid, game.clone());
-    board_broadcast.do_send(ReceiveGame{game});
+    board_broadcast.do_send(ReceiveGame { game });
 
     web::Json(true)
 }
@@ -53,5 +50,5 @@ pub async fn join_game(mut input: web::Query<JoinGameInput>, session: Session) -
 #[derive(Clone, PartialEq, Eq, Debug, Serialize, Deserialize)]
 pub struct JoinGameInput {
     player_name: String,
-    gameid: usize
+    gameid: usize,
 }

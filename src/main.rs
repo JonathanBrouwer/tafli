@@ -5,12 +5,13 @@ extern crate lazy_static;
 #[macro_use]
 extern crate serde;
 
+use std::path::PathBuf;
+
 use actix_cors::Cors;
 use actix_files as fs;
-use actix_session::CookieSession;
-use actix_web::{App, HttpServer, middleware::Logger, web, HttpRequest, Result};
 use actix_files::NamedFile;
-use std::path::PathBuf;
+use actix_session::CookieSession;
+use actix_web::{App, HttpRequest, HttpServer, middleware::Logger, Result, web};
 
 mod tafl;
 mod api;
@@ -42,7 +43,7 @@ async fn main() -> std::io::Result<()> {
         .await
 }
 
-async fn index(req: HttpRequest) -> Result<NamedFile> {
+async fn index(_req: HttpRequest) -> Result<NamedFile> {
     let path: PathBuf = "./tafli/dist/index.html".parse().unwrap();
     println!("{:?}", path);
     Ok(NamedFile::open(path)?)

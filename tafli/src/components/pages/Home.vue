@@ -10,8 +10,8 @@
         </div>
         <h3 class="mx-1">Enter Name</h3>
         <div class="card p-3 mb-2">
-          <label for="name" class="mb-2">What is your name?</label>
-          <input id="name" placeholder="Anonymous" v-model="name">
+          <label class="mb-2" for="name">What is your name?</label>
+          <input id="name" v-model="name" placeholder="Anonymous">
         </div>
 
         <h3 class="mx-1 d-none d-lg-block">Discord</h3>
@@ -46,10 +46,10 @@
             </thead>
             <tbody>
             <tr v-for="pgame in part_games" :key="pgame" style="cursor: pointer;" v-on:click="join_game(pgame.game_id)">
-              <td>{{pgame.player.name}}</td>
+              <td>{{ pgame.player.name }}</td>
               <td>Copenhagen</td>
-              <td>{{pgame.time_start}} + {{pgame.time_incr}}</td>
-              <td>{{ Math.round((Date.now() / 1000 - pgame.created_at)/60)}} minutes ago</td>
+              <td>{{ pgame.time_start }} + {{ pgame.time_incr }}</td>
+              <td>{{ Math.round((Date.now() / 1000 - pgame.created_at) / 60) }} minutes ago</td>
             </tr>
             <tr v-if="part_games.length === 0">
               <td colspan="4">There are currently no games waiting for players</td>
@@ -102,9 +102,9 @@ export default {
       fetch(url.toString(), {method: 'POST', credentials: "include"})
           .then(res => res.json())
           .then(res => {
-            if(res) {
+            if (res) {
               window.location.href = "/game/" + id;
-            }else {
+            } else {
               window.alert("Failed to join game.")
             }
           });

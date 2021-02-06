@@ -1,10 +1,10 @@
+use actix_session::Session;
 use actix_web::{post, web};
 
 use crate::api::game_mgmt::game_mgmt::GAMESTATE;
 use crate::api::in_game::game_broadcast_server;
 use crate::api::in_game::game_broadcast_server::ReceiveGame;
 use crate::api::in_game::make_move::MakeMoveResponse::{ERROR, SUCCESS};
-use actix_session::Session;
 use crate::api::user_mgmt::session_mgmt::UserIdSession;
 
 #[post("/api/make_move")]
@@ -13,11 +13,11 @@ pub async fn make_move(input: web::Query<MakeMoveInput>, session: Session) -> we
 
     let mut games = GAMESTATE.full_games.lock().unwrap();
     let game = games.get_mut(&input.gameid);
-    if game.is_none() { return web::Json(MakeMoveResponse::ERROR) }
+    if game.is_none() { return web::Json(MakeMoveResponse::ERROR); }
     let game = game.unwrap();
 
     if userid != game.player_info(game.board.turn).userid {
-        return web::Json(MakeMoveResponse::ERROR)
+        return web::Json(MakeMoveResponse::ERROR);
     }
 
     let from = input.from();

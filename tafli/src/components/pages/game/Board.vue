@@ -72,7 +72,10 @@ export default {
         //Else, make a move
         let from = this.active_square;
         let to = [x, y];
-        fetch("http://localhost:8000/api/make_move?gameid=" + this.game.gameid + "&from=" + from[0] + "," + from[1] + "&to=" + to[0] + "," + to[1], {method: 'POST', credentials: "include"});
+        fetch("http://localhost:8000/api/make_move?gameid=" + this.game.gameid + "&from=" + from[0] + "," + from[1] + "&to=" + to[0] + "," + to[1], {
+          method: 'POST',
+          credentials: "include"
+        });
         this.active_square = null;
         this.legal_moves = [];
       }
