@@ -8,6 +8,12 @@
           rules, make sure to read the rules before playing.
           <a class="btn btn-block btn-outline-dark mt-3" href="/learn">Learn the rules</a>
         </div>
+        <h3 class="mx-1">Enter Name</h3>
+        <div class="card p-3 mb-2">
+          <label for="name" class="mb-2">What is your name?</label>
+          <input id="name" placeholder="Anonymous" v-model="name">
+        </div>
+
         <h3 class="mx-1 d-none d-lg-block">Discord</h3>
         <span class="d-none d-lg-block">//todo</span>
       </div>
@@ -68,14 +74,15 @@ export default {
   data() {
     return {
       time_modes: [[2, 1, "Bullet"], [3, 2, "Blitz"], [5, 3, "Blitz"], [10, 5, "Rapid"], [15, 15, "Classical"]],
-      part_games: []
+      part_games: [],
+      name: ""
     }
   },
   methods: {
     create_game(t1, t2) {
       let url = new URL("http://localhost:8000/api/create_game");
       url.search = new URLSearchParams({
-        player_name: "Name",
+        player_name: this.name,
         time_start: t1,
         time_incr: t2
       });
@@ -89,7 +96,7 @@ export default {
     join_game(id) {
       let url = new URL("http://localhost:8000/api/join_game");
       url.search = new URLSearchParams({
-        player_name: "Name second",
+        player_name: this.name,
         gameid: id
       });
       fetch(url.toString(), {method: 'POST', credentials: "include"})

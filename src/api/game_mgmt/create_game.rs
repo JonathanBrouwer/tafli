@@ -10,8 +10,9 @@ use crate::api::user_mgmt::session_mgmt::UserIdSession;
 use crate::tafl::game::{Game, PlayerInfo};
 
 #[post("/api/create_game")]
-pub async fn create_game(input: web::Query<CreateGameInput>, session: Session) -> web::Json<usize> {
+pub async fn create_game(mut input: web::Query<CreateGameInput>, session: Session) -> web::Json<usize> {
     let user_id = session.get_user_id();
+    if input.player_name == "" { input.player_name = "Anonymous".parse().unwrap() }
 
     let mut rng = thread_rng();
     let game_id = rng.gen_range(0, 2usize.pow(50));

@@ -11,8 +11,9 @@ use crate::tafl::game::{Game, PlayerInfo};
 use crate::api::in_game::game_broadcast_server::{board_broadcast, ReceiveGame};
 
 #[post("/api/join_game")]
-pub async fn join_game(input: web::Query<JoinGameInput>, session: Session) -> web::Json<bool> {
+pub async fn join_game(mut input: web::Query<JoinGameInput>, session: Session) -> web::Json<bool> {
     let userid = session.get_user_id();
+    if input.player_name == "" { input.player_name = "Anonymous".parse().unwrap() }
 
     //Find game
     let mut games = GAMESTATE.part_games.lock().unwrap();
@@ -22,14 +23,13 @@ pub async fn join_game(input: web::Query<JoinGameInput>, session: Session) -> we
 
     //Validate
     let pgame = games.get(&input.gameid).unwrap();
-    println!("{} {}", pgame.player.userid, userid);
     if pgame.player.userid == userid {
         return web::Json(false);
     }
 
     //Generate colors
     let mut rng = thread_rng();
-    let (wp, bp) = if rng.gen_bool(0.5) {
+    let (mut wp, mut bp) = if rng.gen_bool(0.5) {
         (PlayerInfo {userid, name: input.player_name.clone()}, pgame.player.clone())
     } else {
         (pgame.player.clone(), PlayerInfo {userid, name: input.player_name.clone()})
